@@ -156,14 +156,14 @@
         <table class="data-table" id="product-table">
           <thead>
             <tr>
-              <th style="width:30px" class="bulk-cell" id="prod-bulk-th" style="display:none"><input type="checkbox" id="prod-select-all" onchange="toggleSelectAll()" /></th>
-              <th>Product</th>
-              <th>Category</th>
-              <th>Purchase Price</th>
-              <th>Sale Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th style="width:30px" class="bulk-cell col-opt" id="prod-bulk-th" style="display:none"><input type="checkbox" id="prod-select-all" onchange="toggleSelectAll()" /></th>
+              <th class="col-pri">Product</th>
+              <th class="col-secondary">Category</th>
+              <th class="col-opt">Purchase Price</th>
+              <th class="col-pri">Sale Price</th>
+              <th class="col-pri">Stock</th>
+              <th class="col-secondary">Status</th>
+              <th class="col-pri">Actions</th>
             </tr>
           </thead>
           <tbody id="products-tbody"></tbody>

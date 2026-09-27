@@ -1,0 +1,9 @@
+{
+  "name": "BizBrain",
+  "description": "Offline-First Business Management platform for products, invoices, suppliers, customers, and expenses.",
+  "prompt": "BizBrain - Offline-First Business Management",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

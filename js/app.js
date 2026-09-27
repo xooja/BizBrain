@@ -337,11 +337,11 @@ function renderExpensesTable(expenses) {
 
   tbody.innerHTML = expenses.map(e => `
     <tr>
-      <td><div class="cell-name">${esc(e.title || e.description || 'Expense')}</div></td>
-      <td><span class="badge badge-info">${esc(e.category || 'General')}</span></td>
-      <td style="font-weight:600;color:var(--danger)">${Fmt.currency(e.amount)}</td>
-      <td>${Fmt.date(e.date || e.created_at)}</td>
-      <td>
+      <td data-label="Title"><div class="cell-name">${esc(e.title || e.description || 'Expense')}</div></td>
+      <td data-label="Category"><span class="badge badge-info">${esc(e.category || 'General')}</span></td>
+      <td style="font-weight:600;color:var(--danger)" data-label="Amount">${Fmt.currency(e.amount)}</td>
+      <td data-label="Date">${Fmt.date(e.date || e.created_at)}</td>
+      <td data-label="Actions">
         <div class="table-actions">
           <button class="action-btn edit"   onclick="editExpense('${e.id}')"   title="Edit"><i class="fa-solid fa-pen"></i></button>
           <button class="action-btn delete" onclick="deleteExpense('${e.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
@@ -1642,8 +1642,8 @@ function _renderProductTable() {
     const stockLabel = isOut ? 'Out of Stock' : isLow ? 'Low Stock' : qty;
 
     return `<tr>
-      ${bulkMode ? `<td style="width:30px"><input type="checkbox" class="prod-select" value="${p.id}" ${_prodSelected.has(String(p.id)) ? 'checked' : ''} onchange="toggleProductSelect('${p.id}')" /></td>` : ''}
-      <td>
+      ${bulkMode ? `<td style="width:30px" data-label="Select"><input type="checkbox" class="prod-select" value="${p.id}" ${_prodSelected.has(String(p.id)) ? 'checked' : ''} onchange="toggleProductSelect('${p.id}')" /></td>` : ''}
+      <td data-label="Product">
         <div class="cell-avatar">
           <div class="avatar sm" style="background:${Fmt.avatarColor(p.name)}">${Fmt.initials(p.name)}</div>
           <div>
@@ -1652,12 +1652,12 @@ function _renderProductTable() {
           </div>
         </div>
       </td>
-      <td class="muted">${esc(p.category_name || '—')}</td>
-      <td class="muted">${Fmt.currency(p.purchase_price)}</td>
-      <td style="font-weight:600;color:var(--success)">${Fmt.currency(p.sale_price)}</td>
-      <td><span class="badge badge-${stockBadge}">${stockLabel}</span></td>
-      <td><span class="badge badge-${(p.status||'active') === 'active' ? 'success' : 'muted'}">${p.status || 'active'}</span></td>
-      <td>
+      <td class="muted" data-label="Category">${esc(p.category_name || '—')}</td>
+      <td class="muted" data-label="Purchase Rate">${Fmt.currency(p.purchase_price)}</td>
+      <td style="font-weight:600;color:var(--success)" data-label="Sale Rate">${Fmt.currency(p.sale_price)}</td>
+      <td data-label="Stock Status"><span class="badge badge-${stockBadge}">${stockLabel}</span></td>
+      <td data-label="Status"><span class="badge badge-${(p.status||'active') === 'active' ? 'success' : 'muted'}">${p.status || 'active'}</span></td>
+      <td data-label="Actions">
         <div class="table-actions">
           <button class="action-btn" onclick="viewProductDetail('${p.id}')" title="View"><i class="fa-solid fa-arrow-up"></i></button>
           <button class="action-btn view" onclick="viewProductDetail('${p.id}')" title="View"><i class="fa-solid fa-eye"></i></button>
@@ -2263,8 +2263,8 @@ function _renderCategoryTable() {
     const prodCount = parseInt(c.product_count || 0);
     return `
     <tr>
-      ${bulkMode ? `<td><input type="checkbox" class="cat-checkbox" value="${catId}" ${_catSelected.has(catId) ? 'checked' : ''} onchange="toggleCatSelect('${catId}')" /></td>` : ''}
-      <td>
+      ${bulkMode ? `<td data-label="Select"><input type="checkbox" class="cat-checkbox" value="${catId}" ${_catSelected.has(catId) ? 'checked' : ''} onchange="toggleCatSelect('${catId}')" /></td>` : ''}
+      <td data-label="Category">
         <div class="cell-avatar">
           <div class="avatar sm" style="background:${Fmt.avatarColor(c.name) || 'var(--accent)'}">${Fmt.initials(c.name)}</div>
           <div>
@@ -2272,11 +2272,11 @@ function _renderCategoryTable() {
           </div>
         </div>
       </td>
-      <td class="muted">${esc(c.description || '—')}</td>
-      <td class="muted" style="font-weight:600">${prodCount}</td>
-      <td><span class="badge badge-${statusClass}">${c.status || 'active'}</span></td>
-      <td class="muted">${Fmt.date(c.created_at)}</td>
-      <td>
+      <td class="muted" data-label="Description">${esc(c.description || '—')}</td>
+      <td class="muted" data-label="Products" style="font-weight:600">${prodCount}</td>
+      <td data-label="Status"><span class="badge badge-${statusClass}">${c.status || 'active'}</span></td>
+      <td class="muted" data-label="Created">${Fmt.date(c.created_at)}</td>
+      <td data-label="Actions">
         <div class="table-actions">
           <button class="action-btn view" onclick="viewCategory('${catId}')" title="View"><i class="fa-solid fa-eye"></i></button>
           <button class="action-btn edit" onclick="editCategory('${catId}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
@@ -2797,7 +2797,7 @@ function _renderSupplierTable() {
 
   tbody.innerHTML = pageItems.map(s => `
     <tr>
-      <td>
+      <td data-label="Supplier">
         <div class="cell-avatar">
           <div class="avatar sm">${Fmt.initials(s.company_name || s.contact_person || 'S')}</div>
           <div>
@@ -2806,11 +2806,11 @@ function _renderSupplierTable() {
           </div>
         </div>
       </td>
-      <td class="muted">${esc(s.phone || '—')}</td>
-      <td class="muted">${esc(s.contact_person || s.company_name || '—')}</td>
-       <td style="font-weight:600;color:${(s.opening_balance_type||'').toLowerCase()==='receivable' ? 'var(--success)' : (parseFloat(s.current_balance||0) > 0 ? 'var(--danger)' : 'var(--success)')}">${Fmt.currency(s.current_balance)}</td>
-      <td><span class="badge badge-${(s.status||'active') === 'active' ? 'success' : 'muted'}">${s.status || 'active'}</span></td>
-      <td>
+      <td class="muted" data-label="Phone">${esc(s.phone || '—')}</td>
+      <td class="muted" data-label="Contact">${esc(s.contact_person || s.company_name || '—')}</td>
+       <td data-label="Balance" style="font-weight:600;color:${(s.opening_balance_type||'').toLowerCase()==='receivable' ? 'var(--success)' : (parseFloat(s.current_balance||0) > 0 ? 'var(--danger)' : 'var(--success)')}">${Fmt.currency(s.current_balance)}</td>
+      <td data-label="Status"><span class="badge badge-${(s.status||'active') === 'active' ? 'success' : 'muted'}">${s.status || 'active'}</span></td>
+      <td data-label="Actions">
         <div class="table-actions">
           <button class="action-btn" onclick="openModule('supplier','${s.id}')" title="Detail Sheet" style="color:var(--accent)"><i class="fa-solid fa-arrow-up"></i></button>
           <button class="action-btn view" onclick="viewSupplierDetail('${s.id}')" title="View"><i class="fa-solid fa-eye"></i></button>
@@ -3313,7 +3313,7 @@ function _renderCustomerTable() {
     const balClass = bal > 0 ? 'positive' : bal < 0 ? 'negative' : 'zero';
     const statusClass = (c.status||'active') === 'active' ? 'success' : 'muted';
     return `<tr>
-      <td>
+      <td data-label="Customer">
         <div class="cell-avatar">
           <div class="avatar sm" style="background:${Fmt.avatarColor(c.name)}">${Fmt.initials(c.name)}</div>
           <div>
@@ -3322,13 +3322,13 @@ function _renderCustomerTable() {
           </div>
         </div>
       </td>
-      <td class="muted">${esc(c.company_name || '—')}</td>
-      <td class="muted">${esc(c.phone || '—')}</td>
-      <td class="muted">${esc(_extractCity(c.address) || '—')}</td>
-      <td><span class="customer-balance ${balClass}">${Fmt.currency(bal)}</span></td>
-      <td><span class="badge badge-${statusClass}">${c.status || 'active'}</span></td>
-      <td class="muted">${c.last_transaction_date ? Fmt.date(c.last_transaction_date) : '—'}</td>
-      <td>
+      <td class="muted" data-label="Company">${esc(c.company_name || '—')}</td>
+      <td class="muted" data-label="Phone">${esc(c.phone || '—')}</td>
+      <td class="muted" data-label="City">${esc(_extractCity(c.address) || '—')}</td>
+      <td data-label="Balance"><span class="customer-balance ${balClass}">${Fmt.currency(bal)}</span></td>
+      <td data-label="Status"><span class="badge badge-${statusClass}">${c.status || 'active'}</span></td>
+      <td class="muted" data-label="Last Tx">${c.last_transaction_date ? Fmt.date(c.last_transaction_date) : '—'}</td>
+      <td data-label="Actions">
         <div class="table-actions">
           <button class="action-btn" onclick="openModule('customer','${c.id}')" title="Detail Sheet" style="color:var(--accent)"><i class="fa-solid fa-arrow-up"></i></button>
           <button class="action-btn view" onclick="viewCustomerDetail('${c.id}')" title="View"><i class="fa-solid fa-eye"></i></button>
@@ -4033,14 +4033,14 @@ Pages.purchaseInvoices = async function () {
     const bc = s === 'paid' ? 'success' : s === 'partial' ? 'warning' : s === 'received' ? 'info' : 'danger';
     const sl = s.charAt(0).toUpperCase() + s.slice(1);
     return `<tr>
-      <td style="font-weight:600">${esc(i.invoice_no)}</td>
-      <td><div class="cell-name">${esc(i.supplier_name || '—')}</div></td>
-      <td class="muted">${Fmt.date(i.date)}</td>
-      <td style="font-weight:600">${Fmt.currency(i.total)}</td>
-      <td class="muted">${Fmt.currency(i.paid_amount || 0)}</td>
-      <td style="font-weight:600;color:${parseFloat(i.balance || i.total) > 0 ? 'var(--warning)' : 'var(--success)'}">${Fmt.currency(i.balance || i.total)}</td>
-      <td><span class="badge badge-${bc}">${sl}</span></td>
-      <td><div class="table-actions">
+      <td style="font-weight:600" data-label="Invoice #">${esc(i.invoice_no)}</td>
+      <td data-label="Supplier"><div class="cell-name">${esc(i.supplier_name || '—')}</div></td>
+      <td class="muted" data-label="Date">${Fmt.date(i.date)}</td>
+      <td style="font-weight:600" data-label="Total">${Fmt.currency(i.total)}</td>
+      <td class="muted" data-label="Paid">${Fmt.currency(i.paid_amount || 0)}</td>
+      <td style="font-weight:600;color:${parseFloat(i.balance || i.total) > 0 ? 'var(--warning)' : 'var(--success)'}" data-label="Balance">${Fmt.currency(i.balance || i.total)}</td>
+      <td data-label="Status"><span class="badge badge-${bc}">${sl}</span></td>
+      <td data-label="Actions"><div class="table-actions">
         <button class="action-btn view" onclick="viewPiInvoice('${i.id}')" title="View"><i class="fa-solid fa-eye"></i></button>
         <button class="action-btn edit" onclick="editPiInvoice('${i.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
         <button class="action-btn" onclick="printPiExisting('${i.id}')" title="Print"><i class="fa-solid fa-print"></i></button>
@@ -4477,22 +4477,22 @@ function renderPiProductRows() {
   if (emptyState) emptyState.hidden = true;
   tbody.innerHTML = PI.products.map((p, sourceIndex) => ({ p, sourceIndex })).filter(({ p }) => p.product_id || p.product_name).map(({ p, sourceIndex }, idx) => `
     <tr data-index="${idx}">
-      <td class="pi-display-index"><span class="pi-row-no">${idx + 1}</span></td>
-      <td class="pi-display-product">
+      <td class="pi-display-index" data-label="#"><span class="pi-row-no">${idx + 1}</span></td>
+      <td class="pi-display-product" data-label="Product">
         <strong>${esc(p.product_name || 'Unnamed product')}</strong>
         <small>SKU: ${esc(p.sku || '—')}<br>Barcode: ${esc(p.barcode || '—')}</small>
       </td>
-      <td class="pi-display-value">${esc(p.quantity ?? 0)}</td>
-      <td class="pi-display-value">${esc(p.unit === 'pcs' || p.unit === 'psc' ? 'Pcs' : (p.unit || 'Pcs'))}</td>
-      <td class="pi-display-value">${Fmt.currency(p.purchase_price || 0)}</td>
-      <td class="pi-display-value">${Fmt.currency(p.discount_amount ?? p.discount ?? 0)}</td>
-      <td class="pi-display-value">${Fmt.currency(p.sale_price || 0)}</td>
-      <td class="pi-display-value">${Fmt.currency(p.sale_discount || 0)}</td>
-      <td class="pi-display-value">${Number(p.tax || 0).toFixed(2)}%</td>
-      <td class="pi-display-total">${Fmt.currency(p.lineTotal || 0)}</td>
-      <td class="pi-display-actions">
-        <button class="pi-edit-btn" type="button" onclick="editPiProductRow(${sourceIndex})" title="Edit" aria-label="Edit item"><i class="fa-solid fa-pen"></i></button>
-        <button class="pi-remove-btn" type="button" onclick="removePiProductRow(${sourceIndex})" title="Remove" aria-label="Remove item"><i class="fa-solid fa-trash-can"></i></button>
+      <td class="pi-display-value" data-label="Quantity">${esc(p.quantity ?? 0)}</td>
+      <td class="pi-display-value" data-label="Unit">${esc(p.unit === 'pcs' || p.unit === 'psc' ? 'Pcs' : (p.unit || 'Pcs'))}</td>
+      <td class="pi-display-value" data-label="Purchase Rate">${Fmt.currency(p.purchase_price || 0)}</td>
+      <td class="pi-display-value" data-label="Discount">${Fmt.currency(p.discount_amount ?? p.discount ?? 0)}</td>
+      <td class="pi-display-value" data-label="Sale Rate">${Fmt.currency(p.sale_price || 0)}</td>
+      <td class="pi-display-value" data-label="Sale Disc.">${Fmt.currency(p.sale_discount || 0)}</td>
+      <td class="pi-display-value" data-label="Tax %">${Number(p.tax || 0).toFixed(2)}%</td>
+      <td class="pi-display-total" data-label="Total">${Fmt.currency(p.lineTotal || 0)}</td>
+      <td class="pi-display-actions" data-label="Actions">
+        <button class="pi-edit-btn" type="button" onclick="editPiProductRow(${sourceIndex})" title="Edit" aria-label="Edit item"><i class="fa-solid fa-pen"></i> Edit</button>
+        <button class="pi-remove-btn" type="button" onclick="removePiProductRow(${sourceIndex})" title="Remove" aria-label="Remove item"><i class="fa-solid fa-trash-can"></i> Remove</button>
       </td>
     </tr>
   `).join('');
@@ -5114,14 +5114,14 @@ Pages.salesInvoices = async function () {
   if (!list.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-file-invoice"></i><h3>No sales</h3></div></td></tr>`; return; }
   tbody.innerHTML = list.map(i => `
     <tr>
-      <td style="font-weight:600">${esc(i.invoice_no)}</td>
-      <td class="muted">${esc(i.customer_name || '—')}</td>
-      <td class="muted">${Fmt.date(i.date)}</td>
-      <td style="font-weight:600">${Fmt.currency(i.total)}</td>
-      <td class="muted">${Fmt.currency(i.paid_amount)}</td>
-      <td class="muted">${Fmt.currency(i.balance)}</td>
-      <td><span class="badge badge-${i.status === 'paid' ? 'success' : i.status === 'sent' ? 'info' : 'warning'}">${i.status}</span></td>
-      <td><div class="table-actions"><button class="action-btn delete" onclick="deleteSale('${i.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button></div></td>
+      <td style="font-weight:600" data-label="Invoice #">${esc(i.invoice_no)}</td>
+      <td class="muted" data-label="Customer">${esc(i.customer_name || '—')}</td>
+      <td class="muted" data-label="Date">${Fmt.date(i.date)}</td>
+      <td style="font-weight:600" data-label="Total">${Fmt.currency(i.total)}</td>
+      <td class="muted" data-label="Paid">${Fmt.currency(i.paid_amount)}</td>
+      <td class="muted" data-label="Balance">${Fmt.currency(i.balance)}</td>
+      <td data-label="Status"><span class="badge badge-${i.status === 'paid' ? 'success' : i.status === 'sent' ? 'info' : 'warning'}">${i.status}</span></td>
+      <td data-label="Actions"><div class="table-actions"><button class="action-btn delete" onclick="deleteSale('${i.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button></div></td>
     </tr>`).join('');
 };
 window.openSalesInvoiceModal = function() { showToast('Sales form coming soon', 'info'); };
@@ -5136,13 +5136,13 @@ Pages.purchaseReturns = async function () {
   if (!list.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-arrow-left"></i><h3>No purchase returns</h3></div></td></tr>`; return; }
   tbody.innerHTML = list.map(r => `
     <tr>
-      <td style="font-weight:600">${esc(r.return_no)}</td>
-      <td class="muted">${esc(r.supplier_name || '—')}</td>
-      <td class="muted">${Fmt.date(r.date)}</td>
-      <td style="font-weight:600">${Fmt.currency(r.total)}</td>
-      <td class="muted">${esc(r.reason || '—')}</td>
-      <td><span class="badge badge-${r.status === 'completed' ? 'success' : 'warning'}">${r.status}</span></td>
-      <td><div class="table-actions"><button class="action-btn delete" onclick="deletePR('${r.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button></div></td>
+      <td style="font-weight:600" data-label="Return #">${esc(r.return_no)}</td>
+      <td class="muted" data-label="Supplier">${esc(r.supplier_name || '—')}</td>
+      <td class="muted col-opt" data-label="Date">${Fmt.date(r.date)}</td>
+      <td style="font-weight:600" data-label="Total">${Fmt.currency(r.total)}</td>
+      <td class="muted col-opt" data-label="Reason">${esc(r.reason || '—')}</td>
+      <td data-label="Status"><span class="badge badge-${r.status === 'completed' ? 'success' : 'warning'}">${r.status}</span></td>
+      <td data-label="Actions"><div class="table-actions"><button class="action-btn delete" onclick="deletePR('${r.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button></div></td>
     </tr>`).join('');
 };
 window.openPurchaseReturnModal = function() { showToast('Purchase return form coming soon', 'info'); };
@@ -5157,13 +5157,13 @@ Pages.salesReturns = async function () {
   if (!list.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-arrow-right"></i><h3>No sales returns</h3></div></td></tr>`; return; }
   tbody.innerHTML = list.map(r => `
     <tr>
-      <td style="font-weight:600">${esc(r.return_no)}</td>
-      <td class="muted">${esc(r.customer_name || '—')}</td>
-      <td class="muted">${Fmt.date(r.date)}</td>
-      <td style="font-weight:600">${Fmt.currency(r.total)}</td>
-      <td class="muted">${esc(r.reason || '—')}</td>
-      <td><span class="badge badge-${r.status === 'completed' ? 'success' : 'warning'}">${r.status}</span></td>
-      <td><div class="table-actions"><button class="action-btn delete" onclick="deleteSR('${r.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button></div></td>
+      <td style="font-weight:600" data-label="Return #">${esc(r.return_no)}</td>
+      <td class="muted" data-label="Customer">${esc(r.customer_name || '—')}</td>
+      <td class="muted col-opt" data-label="Date">${Fmt.date(r.date)}</td>
+      <td style="font-weight:600" data-label="Total">${Fmt.currency(r.total)}</td>
+      <td class="muted col-opt" data-label="Reason">${esc(r.reason || '—')}</td>
+      <td data-label="Status"><span class="badge badge-${r.status === 'completed' ? 'success' : 'warning'}">${r.status}</span></td>
+      <td data-label="Actions"><div class="table-actions"><button class="action-btn delete" onclick="deleteSR('${r.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button></div></td>
     </tr>`).join('');
 };
 window.openSalesReturnModal = function() { showToast('Sales return form coming soon', 'info'); };
@@ -5182,10 +5182,10 @@ Pages.accounts = async function () {
     setEl('acc-due-purchases', Fmt.currency(payables));
 
     const sb = document.getElementById('acc-suppliers-body');
-    if (sb) sb.innerHTML = suppliers.map(s => `<tr><td>${esc(s.company_name)}</td><td>${Fmt.currency(s.current_balance)}</td></tr>`).join('') || `<tr><td colspan="2"><p style="color:var(--txt-muted);text-align:center">No suppliers</p></td></tr>`;
+    if (sb) sb.innerHTML = suppliers.map(s => `<tr><td data-label="Supplier">${esc(s.company_name)}</td><td data-label="Balance" style="font-weight:600;color:var(--danger)">${Fmt.currency(s.current_balance)}</td></tr>`).join('') || `<tr><td colspan="2"><p style="color:var(--txt-muted);text-align:center">No suppliers</p></td></tr>`;
 
     const cb = document.getElementById('acc-customers-body');
-    if (cb) cb.innerHTML = customers.map(c => `<tr><td>${esc(c.name)}</td><td>${Fmt.currency(c.current_balance)}</td></tr>`).join('') || `<tr><td colspan="2"><p style="color:var(--txt-muted);text-align:center">No customers</p></td></tr>`;
+    if (cb) cb.innerHTML = customers.map(c => `<tr><td data-label="Customer">${esc(c.name)}</td><td data-label="Balance" style="font-weight:600;color:var(--success)">${Fmt.currency(c.current_balance)}</td></tr>`).join('') || `<tr><td colspan="2"><p style="color:var(--txt-muted);text-align:center">No customers</p></td></tr>`;
   } catch(e) { showToast('Failed to load accounts', 'error'); }
 };
 
@@ -5198,12 +5198,12 @@ Pages.team = async function () {
   if (!members.length) { tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-users-gear"></i><h3>No team members</h3></div></td></tr>`; return; }
   tbody.innerHTML = members.map(m => `
     <tr>
-      <td><div class="cell-name">${esc(m.name)}</div></td>
-      <td class="muted">${esc(m.email)}</td>
-      <td class="muted">${esc(m.phone || '—')}</td>
-      <td class="muted">${esc(m.role_name || '—')}</td>
-      <td><span class="badge badge-${m.status === 'active' ? 'success' : 'muted'}">${m.status}</span></td>
-      <td><div class="table-actions">
+      <td data-label="Member"><div class="cell-name">${esc(m.name)}</div></td>
+      <td class="muted" data-label="Email">${esc(m.email)}</td>
+      <td class="muted col-opt" data-label="Phone">${esc(m.phone || '—')}</td>
+      <td class="muted col-secondary" data-label="Role">${esc(m.role_name || '—')}</td>
+      <td data-label="Status"><span class="badge badge-${m.status === 'active' ? 'success' : 'muted'}">${m.status}</span></td>
+      <td data-label="Actions"><div class="table-actions">
         <button class="action-btn edit" onclick="editTeamMember('${m.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
         <button class="action-btn delete" onclick="deleteTeamMember('${m.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
       </div></td>

@@ -1,7 +1,0 @@
-# Protect uploads directory
-# Deny PHP execution
-<FilesMatch "\.php$">
-  Deny from all
-</FilesMatch>
-
-# Allow direct image access

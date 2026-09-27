@@ -17,25 +17,20 @@
       .page-container .stat-value { font-size: 20px; }
       .page-container .section-header { flex-wrap: wrap; gap: 8px; padding: 16px; }
       .page-container .section-body { padding: 8px 12px !important; }
-      .page-container .data-table th,
-      .page-container .data-table td { padding: 8px 8px !important; font-size: 12px; }
       .page-container .pagination { gap: 2px; }
       .page-container .page-btn { width: 28px; height: 28px; font-size: 11px; }
       .page-container .table-footer { flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
       .page-container .quick-actions { grid-template-columns: repeat(2, 1fr) !important; }
       .page-container .quick-action-btn { padding: 8px !important; font-size: 11px !important; }
-      .page-container .cell-name { font-size: 12px; }
-      .page-container .cell-sub { font-size: 10px; }
-      .page-container .avatar.sm { width: 24px; height: 24px; font-size: 9px; }
+      .page-container .cell-name { font-size: 13px; font-weight: 600; }
+      .page-container .cell-sub { font-size: 11px; }
+      .page-container .avatar.sm { width: 28px; height: 28px; font-size: 10px; }
       .page-container .inv-summary-row { flex-direction: column; }
       .page-container .inv-summary-card { min-width: auto; width: 100%; }
-      .page-container .fs-modal { margin: 10px auto; max-height: calc(100vh - 20px); }
+      .page-container .fs-modal { margin: 0 auto; max-height: 100vh; height: 100%; border-radius: 0; }
       .page-container .fs-modal-body { padding: 16px; }
-      .page-container .fs-modal-overlay { padding: 10px; }
+      .page-container .fs-modal-overlay { padding: 0; }
       .page-container .supplier-row { flex-direction: column; }
-      .page-container .inv-table { font-size: 13px; }
-      .page-container .inv-table th,
-      .page-container .inv-table td { padding: 4px 6px; }
       .page-container .recs-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 480px) {
@@ -44,8 +39,6 @@
       .page-container .stat-value { font-size: 18px; }
       .page-container .quick-actions { grid-template-columns: 1fr !important; }
       .page-container .quick-action-btn { padding: 8px !important; font-size: 11px !important; }
-      .page-container .inv-table th,
-      .page-container .inv-table td { padding: 4px 4px !important; font-size: 11px; }
     }
     /* ── Purchase Invoice specific ─────────────────────────── */
     .pi-insight-section { margin-bottom: 18px; }
@@ -201,14 +194,14 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th>Invoice #</th>
-              <th>Supplier</th>
-              <th>Date</th>
-              <th>Total</th>
-              <th>Paid</th>
-              <th>Balance</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th class="col-pri">Invoice #</th>
+              <th class="col-pri">Supplier</th>
+              <th class="col-opt">Date</th>
+              <th class="col-pri">Total</th>
+              <th class="col-secondary">Paid</th>
+              <th class="col-opt">Balance</th>
+              <th class="col-pri">Status</th>
+              <th class="col-pri">Actions</th>
             </tr>
           </thead>
           <tbody id="purchases-tbody">

@@ -1,14 +1,21 @@
 /* ═══════════════════════════════════════════════════════════
    BizBrain — tables.css
+   RESPONSIVE HYBRID TABLE SYSTEM
+   Desktop: Full feature-rich table
+   Tablet (768px-1199px): Compact table with secondary columns hidden
+   Mobile (<768px): Card-based responsive view with touch action bar
 ═══════════════════════════════════════════════════════════ */
 
-/* ── Table Wrapper ───────────────────────────────────────── */
+/* ── Table Wrapper & Scroller ────────────────────────────── */
 .table-wrap {
   background: var(--bg-card);
   backdrop-filter: blur(20px);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .table-header {
@@ -19,6 +26,8 @@
   border-bottom: 1px solid var(--border);
   gap: 12px;
   flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .table-title {
@@ -27,15 +36,25 @@
   font-weight: 700;
 }
 
-/* ── Table ───────────────────────────────────────────────── */
+.table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+
+/* ── Standard Desktop Table ──────────────────────────────── */
 .data-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  text-align: left;
 }
 
 .data-table thead tr {
   border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.015);
 }
 
 .data-table th {
@@ -69,7 +88,7 @@
 }
 
 .data-table td {
-  padding: 14px 16px;
+  padding: 13px 16px;
   color: var(--txt-primary);
   vertical-align: middle;
 }
@@ -98,14 +117,15 @@
 .avatar.sm { width: 28px; height: 28px; font-size: 11px; }
 .avatar.lg { width: 48px; height: 48px; font-size: 18px; }
 
-.cell-name  { font-weight: 500; font-size: 14px; }
-.cell-sub   { font-size: 12px; color: var(--txt-secondary); }
+.cell-name  { font-weight: 600; font-size: 14px; color: var(--txt-primary); }
+.cell-sub   { font-size: 12px; color: var(--txt-secondary); margin-top: 1px; }
 
 /* ── Action Buttons ──────────────────────────────────────── */
 .table-actions {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .action-btn {
@@ -121,21 +141,23 @@
 }
 
 .action-btn:hover { background: var(--bg-glass-hov); color: var(--txt-primary); }
-.action-btn.edit:hover  { border-color: var(--accent); color: var(--accent); }
+.action-btn.edit:hover   { border-color: var(--accent); color: var(--accent); background: rgba(59,130,246,0.1); }
 .action-btn.delete:hover { border-color: var(--danger); color: var(--danger); background: rgba(239,68,68,0.1); }
-.action-btn.view:hover  { border-color: var(--info);  color: var(--info); }
+.action-btn.view:hover   { border-color: var(--info);   color: var(--info);   background: rgba(6,182,212,0.1); }
 
 /* ── Table Footer / Pagination ───────────────────────────── */
 .table-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 24px;
+  padding: 14px 20px;
   border-top: 1px solid var(--border);
   font-size: 13px;
   color: var(--txt-secondary);
   gap: 12px;
   flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pagination {
@@ -160,11 +182,278 @@
 .page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
 .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ── Overflow scroll on mobile ───────────────────────────── */
-.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* ═══════════════════════════════════════════════════════════
+   TIER 2: TABLET / SMALL LAPTOP (768px – 1199px)
+   COMPACT TABLE: Automatically hide secondary & optional columns
+   Retains traditional table structure, preserves readability
+═══════════════════════════════════════════════════════════ */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .data-table th, .data-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
 
-@media (max-width: 768px) {
-  .data-table th, .data-table td { padding: 10px 12px; }
-  .table-header { flex-direction: column; align-items: flex-start; }
-  .table-footer { flex-direction: column; align-items: flex-start; }
+  /* Hide designated optional and secondary columns */
+  .col-optional,
+  .col-secondary-tablet-hide,
+  .data-table th.col-opt,
+  .data-table td.col-opt,
+  .data-table th.col-secondary,
+  .data-table td.col-secondary {
+    display: none !important;
+  }
+
+  /* Specific column reductions for standard pages on tablet */
+  /* Purchase Invoices: Hide Date & Balance on tablet, keep Invoice#, Supplier, Total, Paid, Status, Actions */
+  #purchases-tbody tr td:nth-child(3),
+  .data-table thead tr th:nth-child(3),
+  #purchases-tbody tr td:nth-child(6),
+  .data-table thead tr th:nth-child(6) {
+    display: none;
+  }
+
+  /* Sales Invoices: Hide Date & Balance on tablet */
+  #sales-tbody tr td:nth-child(3),
+  #sales-tbody tr td:nth-child(6),
+  .page-container [id*="sales"] table thead tr th:nth-child(3),
+  .page-container [id*="sales"] table thead tr th:nth-child(6) {
+    display: none;
+  }
+
+  /* Customers: Hide Area/City & Last Tx on tablet */
+  #customers-tbody tr td:nth-child(4),
+  #customers-tbody tr td:nth-child(7),
+  #customer-table thead tr th:nth-child(4),
+  #customer-table thead tr th:nth-child(7) {
+    display: none;
+  }
+
+  /* Products: Hide Purchase Price & Unit on tablet */
+  #products-tbody tr td:nth-child(4),
+  #product-table thead tr th:nth-child(4) {
+    display: none;
+  }
+
+  /* Categories: Hide Description & Created date on tablet */
+  #categories-tbody tr td:nth-child(2),
+  #categories-tbody tr td:nth-child(5),
+  .page-container [id*="category"] table thead tr th:nth-child(2),
+  .page-container [id*="category"] table thead tr th:nth-child(5) {
+    display: none;
+  }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   TIER 3: MOBILE (< 768px)
+   CARD-BASED RESPONSIVE VIEW (CENTER REFERENCE DESIGN)
+   Transforms each table row into an individual touch-friendly card
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Prevent horizontal screen blowup */
+  .table-scroll {
+    overflow-x: visible;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .table-footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+
+  .table-footer .pagination {
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* Transform table to card list */
+  .data-table,
+  .table-scroll .data-table,
+  .page-container .data-table {
+    display: block !important;
+    width: 100% !important;
+    border-collapse: separate !important;
+  }
+
+  /* Hide table headers completely on mobile */
+  .data-table thead,
+  .table-scroll .data-table thead,
+  .page-container .data-table thead {
+    display: none !important;
+  }
+
+  .data-table tbody,
+  .table-scroll .data-table tbody,
+  .page-container .data-table tbody {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Each row becomes a high-fidelity glassmorphism card */
+  .data-table tbody tr,
+  .table-scroll .data-table tbody tr,
+  .page-container .data-table tbody tr {
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--bg-card, rgba(17, 24, 39, 0.95)) !important;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--radius-md, 12px) !important;
+    padding: 14px 16px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    transition: transform var(--transition), border-color var(--transition);
+  }
+
+  .data-table tbody tr:hover,
+  .table-scroll .data-table tbody tr:hover,
+  .page-container .data-table tbody tr:hover {
+    border-color: rgba(59, 130, 246, 0.35) !important;
+    transform: translateY(-1px);
+  }
+
+  /* Each cell becomes a key-value row within the card */
+  .data-table td,
+  .table-scroll .data-table td,
+  .page-container .data-table td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    font-size: 13px !important;
+    color: var(--txt-primary) !important;
+    text-align: right !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Primary identifier (First column - Invoice #, Product name, Customer) */
+  .data-table td:first-child,
+  .page-container .data-table td:first-child {
+    padding-top: 0 !important;
+    padding-bottom: 10px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--txt-primary) !important;
+  }
+
+  /* Action buttons row at card footer */
+  .data-table td:last-child,
+  .page-container .data-table td:last-child {
+    border-bottom: none !important;
+    padding-top: 12px !important;
+    padding-bottom: 0 !important;
+    justify-content: flex-end !important;
+    margin-top: 2px;
+  }
+
+  /* Attribute data-label rendering (Left Label) */
+  .data-table td[data-label]::before,
+  .table-scroll .data-table td[data-label]::before,
+  .page-container .data-table td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--txt-muted);
+    text-align: left;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  /* First child label override if identifier */
+  .data-table td:first-child::before,
+  .page-container .data-table td:first-child::before {
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* Actions container in mobile card: full width touch bar */
+  .data-table .table-actions,
+  .page-container .data-table .table-actions {
+    width: 100% !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+  }
+
+  .data-table .action-btn,
+  .page-container .data-table .action-btn {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+  }
+
+  /* Avatar cell in mobile card */
+  .data-table .cell-avatar,
+  .page-container .data-table .cell-avatar {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  /* Empty state card */
+  .data-table tr td[colspan],
+  .page-container .data-table tr td[colspan] {
+    display: block !important;
+    border: none !important;
+    text-align: center !important;
+    padding: 24px 0 !important;
+  }
+
+  .data-table tr td[colspan]::before {
+    display: none !important;
+    content: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TIER 4: EXTRA COMPACT MOBILE (<= 480px)
+   Dense spacing, full width buttons, zero clipping
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .data-table tbody tr,
+  .page-container .data-table tbody tr {
+    padding: 12px 14px !important;
+    border-radius: 10px !important;
+  }
+
+  .data-table td,
+  .page-container .data-table td {
+    padding: 6px 0 !important;
+    font-size: 12.5px !important;
+  }
+
+  .data-table td[data-label]::before,
+  .page-container .data-table td[data-label]::before {
+    font-size: 10.5px;
+  }
+
+  .table-footer {
+    padding: 10px 12px;
+  }
+
+  .pagination .page-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 11.5px;
+  }
+}
+

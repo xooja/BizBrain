@@ -1,0 +1,26 @@
+<div class="page-container error-page">
+  <div class="page-header">
+    <div>
+      <h1>Maintenance</h1>
+      <p class="page-subtitle">System Under Maintenance</p>
+    </div>
+  </div>
+  <div class="empty-state" style="padding:60px 20px">
+    <i class="fa-solid fa-screwdriver-wrench" style="font-size:72px;color:var(--warning);opacity:0.4"></i>
+    <h2 style="margin-top:16px;font-size:22px;font-weight:700">System Under Maintenance</h2>
+    <p style="color:var(--txt-secondary);max-width:380px;margin:12px auto">
+      We are currently performing scheduled maintenance. We will be back shortly.
+    </p>
+    <p style="color:var(--txt-muted);font-size:13px;margin-bottom:8px">
+      Please check back in a few minutes.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="location.reload()">
+        <i class="fa-solid fa-rotate"></i> Refresh
+      </button>
+      <button class="btn btn-secondary" onclick="Router.navigate('dashboard')">
+        <i class="fa-solid fa-gauge-high"></i> Dashboard
+      </button>
+    </div>
+  </div>
+</div>

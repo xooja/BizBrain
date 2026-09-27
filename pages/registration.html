@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0d14" />
+  <meta name="description" content="BizBrain - Register your business" />
+  <title>Create Your Business — BizBrain</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="../manifest.json" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../css/app.css" />
+  <link rel="stylesheet" href="../css/forms.css" />
+  <link rel="stylesheet" href="../css/registration.css" />
+</head>
+<body>
+
+<!-- ─── REGISTRATION SCREEN ──────────────────────────────── -->
+<div class="reg-screen">
+  <div class="reg-bg">
+    <div class="reg-blob reg-blob-1"></div>
+    <div class="reg-blob reg-blob-2"></div>
+    <div class="reg-blob reg-blob-3"></div>
+  </div>
+
+  <div class="reg-container">
+    <!-- Header -->
+    <div class="reg-header">
+      <div class="reg-logo">
+        <div class="logo-icon"><i class="fa-solid fa-brain"></i></div>
+        <span class="logo-text">BizBrain</span>
+      </div>
+      <h1 class="reg-title">Create Your Business Account</h1>
+      <p class="reg-subtitle">Set up your ERP in 4 easy steps</p>
+    </div>
+
+    <!-- Stepper -->
+    <div class="reg-stepper">
+      <div class="step-indicator active" data-step="1">
+        <div class="step-circle"><span class="step-num">1</span></div>
+        <span class="step-label">Account</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-indicator" data-step="2">
+        <div class="step-circle"><span class="step-num">2</span></div>
+        <span class="step-label">Business</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-indicator" data-step="3">
+        <div class="step-circle"><span class="step-num">3</span></div>
+        <span class="step-label">Settings</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-indicator" data-step="4">
+        <div class="step-circle"><span class="step-num">4</span></div>
+        <span class="step-label">Initialization</span>
+      </div>
+    </div>
+
+    <!-- Wizard Card -->
+    <div class="reg-card">
+      <div id="reg-alert" class="reg-alert error"></div>
+
+      <!-- ═══ STEP 1 — Account & Security ═══ -->
+      <div id="step-1" class="reg-step" style="display:none">
+        <h2 class="reg-step-title">Account & Security</h2>
+        <p class="reg-step-desc">Create your login credentials. All fields marked <span style="color:var(--danger)">*</span> are required.</p>
+
+        <div class="reg-row">
+          <div class="form-group">
+            <label>Username <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-at"></i>
+              <input type="text" id="s1_username" name="s1_username" placeholder="johndoe" autocomplete="off" maxlength="60" />
+              <span class="field-status"></span>
+            </div>
+            <div class="form-error-msg"></div>
+            <div class="form-hint">Min 3 characters, letters, numbers, underscores</div>
+          </div>
+          <div class="form-group">
+            <label>Email Address <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-envelope"></i>
+              <input type="email" id="s1_email" name="s1_email" placeholder="john@company.com" autocomplete="email" />
+              <span class="field-status"></span>
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+        </div>
+
+        <div class="reg-row">
+          <div class="form-group">
+            <label>Phone Number</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-phone"></i>
+              <input type="tel" id="s1_phone" name="s1_phone" placeholder="+1 555-000-0000" autocomplete="tel" />
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+          <div class="form-group"></div>
+        </div>
+
+        <div class="reg-row">
+          <div class="form-group">
+            <label>Password <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="s1_password" name="s1_password" placeholder="Create a strong password" autocomplete="new-password" />
+              <button type="button" class="toggle-pw" onclick="const inp=document.getElementById('s1_password'); inp.type=inp.type==='password'?'text':'password'; this.querySelector('i').className='fa-solid fa-eye'+(inp.type==='password'?'':' fa-eye-slash')"><i class="fa-solid fa-eye"></i></button>
+            </div>
+            <div class="form-error-msg"></div>
+            <div class="pw-strength">
+              <div class="pw-strength-bar"></div>
+              <div class="pw-strength-bar"></div>
+              <div class="pw-strength-bar"></div>
+              <div class="pw-strength-bar"></div>
+            </div>
+            <div id="pw-strength-text" class="pw-strength-text"></div>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="s1_confirm_password" name="s1_confirm_password" placeholder="Re-enter password" autocomplete="new-password" />
+              <button type="button" class="toggle-pw" onclick="const inp=document.getElementById('s1_confirm_password'); inp.type=inp.type==='password'?'text':'password'; this.querySelector('i').className='fa-solid fa-eye'+(inp.type==='password'?'':' fa-eye-slash')"><i class="fa-solid fa-eye"></i></button>
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+        </div>
+
+        <div class="reg-row">
+          <div class="form-group">
+            <label>4-Digit Security PIN <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-shield-halved"></i>
+              <input type="password" id="s1_pin" name="s1_pin" placeholder="••••" maxlength="4" inputmode="numeric" pattern="\d*" autocomplete="off" />
+              <button type="button" class="toggle-pw" onclick="const inp=document.getElementById('s1_pin'); inp.type=inp.type==='password'?'text':'password'; this.querySelector('i').className='fa-solid fa-eye'+(inp.type==='password'?'':' fa-eye-slash')"><i class="fa-solid fa-eye"></i></button>
+            </div>
+            <div class="form-error-msg"></div>
+            <div class="form-hint">Used for quick approvals and security verification</div>
+          </div>
+          <div class="form-group">
+            <label>Confirm PIN <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-shield-halved"></i>
+              <input type="password" id="s1_confirm_pin" name="s1_confirm_pin" placeholder="••••" maxlength="4" inputmode="numeric" pattern="\d*" autocomplete="off" />
+              <button type="button" class="toggle-pw" onclick="const inp=document.getElementById('s1_confirm_pin'); inp.type=inp.type==='password'?'text':'password'; this.querySelector('i').className='fa-solid fa-eye'+(inp.type==='password'?'':' fa-eye-slash')"><i class="fa-solid fa-eye"></i></button>
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 2 — Business Information ═══ -->
+      <div id="step-2" class="reg-step" style="display:none">
+        <h2 class="reg-step-title">Business Information</h2>
+        <p class="reg-step-desc">Tell us about your business.</p>
+
+        <div class="reg-row">
+          <div class="form-group">
+            <label>Business Name <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-store"></i>
+              <input type="text" id="s2_business_name" name="s2_business_name" placeholder="e.g. Acme Corp" />
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label>Business Type <span class="required">*</span></label>
+            <div id="s2_business_type_wrap" class="srch-wrap"></div>
+            <div class="form-error-msg"></div>
+          </div>
+        </div>
+
+        <div class="reg-row">
+          <div class="form-group">
+            <label>Owner Name <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-user"></i>
+              <input type="text" id="s2_owner_name" name="s2_owner_name" placeholder="Full name" />
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label>Business Registration Number</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-certificate"></i>
+              <input type="text" id="s2_reg_number" name="s2_reg_number" placeholder="Optional" />
+            </div>
+          </div>
+        </div>
+
+        <div class="reg-row">
+          <div class="form-group">
+            <label>NTN / Tax Number</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-file-invoice"></i>
+              <input type="text" id="s2_tax_number" name="s2_tax_number" placeholder="Optional" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Business Logo</label>
+            <div class="reg-file-drop">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <p>Upload Logo</p>
+              <span>PNG, JPG or WebP (max 2MB)</span>
+              <input type="file" id="s2_logo" name="s2_logo" accept="image/png,image/jpeg,image/webp" />
+            </div>
+            <div id="logo-preview" class="file-preview" style="display:none">
+              <i class="fa-solid fa-image"></i>
+              <span class="file-name"></span>
+              <button type="button" class="file-remove" onclick="Registration.removeLogo()"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group reg-full">
+          <label>Business Description</label>
+          <textarea id="s2_description" name="s2_description" placeholder="Tell us about your business (optional)" rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 3 — Location & Settings ═══ -->
+      <div id="step-3" class="reg-step" style="display:none">
+        <h2 class="reg-step-title">Location & Business Settings</h2>
+        <p class="reg-step-desc">Configure your business location and default preferences.</p>
+
+        <div class="reg-row-3">
+          <div class="form-group">
+            <label>Country <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-globe"></i>
+              <input type="text" id="s3_country" name="s3_country" placeholder="e.g. United States" />
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label>State / Province <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-map-pin"></i>
+              <input type="text" id="s3_state" name="s3_state" placeholder="e.g. California" />
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label>City <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-city"></i>
+              <input type="text" id="s3_city" name="s3_city" placeholder="e.g. San Francisco" />
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+        </div>
+
+        <div class="form-group reg-full">
+          <label>Full Business Address <span class="required">*</span></label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-location-dot"></i>
+            <textarea id="s3_address" name="s3_address" placeholder="Street, building, postal code" rows="2"></textarea>
+          </div>
+          <div class="form-error-msg"></div>
+        </div>
+
+        <div class="reg-row-3">
+          <div class="form-group">
+            <label>Currency <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-money-bill-wave"></i>
+              <select id="s3_currency" name="s3_currency"></select>
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label>Currency Symbol</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-dollar-sign"></i>
+              <input type="text" id="s3_currency_symbol" name="s3_currency_symbol" value="$" placeholder="$" style="padding-left:14px!important;text-align:center;font-size:20px;font-weight:700" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Timezone <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-clock"></i>
+              <select id="s3_timezone" name="s3_timezone"></select>
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+        </div>
+
+        <div class="reg-row-3">
+          <div class="form-group">
+            <label>Date Format <span class="required">*</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-calendar"></i>
+              <select id="s3_date_format" name="s3_date_format"></select>
+            </div>
+            <div class="form-error-msg"></div>
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <label class="reg-checkbox">
+              <input type="checkbox" id="s3_tax_enabled" name="s3_tax_enabled" />
+              Enable Tax System
+            </label>
+            <div class="form-hint">Apply tax to invoices and transactions</div>
+          </div>
+          <div class="form-group">
+            <label>Default Tax %</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-percent"></i>
+              <input type="number" id="s3_tax_percent" name="s3_tax_percent" value="0" min="0" max="100" step="0.01" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 4 — Business Initialization ═══ -->
+      <div id="step-4" class="reg-step" style="display:none">
+        <h2 class="reg-step-title">Business Initialization</h2>
+        <p class="reg-step-desc">Set up your opening balance and initial data. All fields except Opening Date can be skipped.</p>
+
+        <div class="form-group reg-full">
+          <label>Opening Business Date <span class="required">*</span></label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-calendar-plus"></i>
+            <input type="date" id="s4_opening_date" name="s4_opening_date"  />
+          </div>
+          <div class="form-error-msg"></div>
+        </div>
+
+        <div class="reg-step-title" style="font-size:16px;margin-bottom:16px;margin-top:8px">
+          <i class="fa-solid fa-coins" style="color:var(--accent)"></i> Financial Setup <span style="font-size:12px;font-weight:400;color:var(--txt-muted)">— Optional</span>
+        </div>
+        <div class="reg-row-3">
+          <div class="form-group">
+            <label>Cash in Hand</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-money-bill"></i>
+              <input type="number" id="s4_cash_in_hand" name="s4_cash_in_hand" placeholder="0" min="0" step="0.01"  />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Bank Balance</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-building-columns"></i>
+              <input type="number" id="s4_bank_balance" name="s4_bank_balance" placeholder="0" min="0" step="0.01" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Opening Capital</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-chart-line"></i>
+              <input type="number" id="s4_opening_capital" name="s4_opening_capital" placeholder="0" min="0" step="0.01"  />
+            </div>
+          </div>
+        </div>
+
+        <div class="reg-step-title" style="font-size:16px;margin-bottom:16px;margin-top:8px">
+          <i class="fa-solid fa-toolbox" style="color:var(--accent)"></i> Assets <span style="font-size:12px;font-weight:400;color:var(--txt-muted)">— Optional</span>
+        </div>
+        <div class="reg-row-3">
+          <div class="form-group">
+            <label>Total Assets Value</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-cubes"></i>
+              <input type="number" id="s4_total_assets_value" name="s4_total_assets_value" placeholder="0" min="0" step="0.01" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Equipment Value</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-microchip"></i>
+              <input type="number" id="s4_equipment_value" name="s4_equipment_value" placeholder="0" min="0" step="0.01"  />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Furniture Value</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-chair"></i>
+              <input type="number" id="s4_furniture_value" name="s4_furniture_value" placeholder="0" min="0" step="0.01" />
+            </div>
+          </div>
+        </div>
+
+        <div class="reg-row-3">
+          <div class="form-group">
+            <label>Vehicle Value</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-truck"></i>
+              <input type="number" id="s4_vehicle_value" name="s4_vehicle_value" placeholder="0" min="0" step="0.01"  />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Product Count</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-cube"></i>
+              <input type="number" id="s4_product_count" name="s4_product_count" placeholder="0" min="0"  />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Inventory Value</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-warehouse"></i>
+              <input type="number" id="s4_inventory_value" name="s4_inventory_value" placeholder="0" min="0" step="0.01" />
+            </div>
+          </div>
+        </div>
+
+        <div class="reg-step-title" style="font-size:16px;margin-bottom:16px;margin-top:8px">
+          <i class="fa-solid fa-chart-simple" style="color:var(--accent)"></i> Business Performance <span style="font-size:12px;font-weight:400;color:var(--txt-muted)">— Optional</span>
+        </div>
+        <div class="reg-row">
+          <div class="form-group">
+            <label>Average Monthly Sales</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+              <input type="number" id="s4_avg_monthly_sales" name="s4_avg_monthly_sales" placeholder="0" min="0" step="0.01" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Average Monthly Expenses</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-arrow-trend-down"></i>
+              <input type="number" id="s4_avg_monthly_expenses" name="s4_avg_monthly_expenses" placeholder="0" min="0" step="0.01"  />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 5 — Review & Confirm ═══ -->
+      <div id="step-5" class="reg-step" style="display:none">
+        <h2 class="reg-step-title">Review & Confirm</h2>
+        <p class="reg-step-desc">Please review all your information before creating your account.</p>
+
+        <div id="review-content"></div>
+
+        <div class="terms-section">
+          <label class="reg-checkbox">
+            <input type="checkbox" id="terms_accepted" />
+            I accept the <a href="#" style="color:var(--accent);text-decoration:none" onclick="event.preventDefault()">Terms & Conditions</a>
+          </label>
+          <label class="reg-checkbox">
+            <input type="checkbox" id="privacy_accepted" />
+            I accept the <a href="#" style="color:var(--accent);text-decoration:none" onclick="event.preventDefault()">Privacy Policy</a>
+          </label>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="reg-actions">
+        <button type="button" class="btn btn-secondary" id="btn-prev" style="display:none">
+          <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+        </button>
+        <div class="reg-actions-right">
+          <button type="button" class="btn-skip" id="btn-skip" style="display:none">Skip For Now</button>
+          <button type="button" class="btn btn-primary" id="btn-next">
+            <span>Continue</span> <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div><!-- /reg-card -->
+  </div><!-- /reg-container -->
+</div><!-- /reg-screen -->
+
+<!-- ─── SUCCESS OVERLAY ────────────────────────────────── -->
+<div id="reg-success" class="reg-success-overlay">
+  <div class="reg-success-box glass-card" style="padding:48px 40px">
+    <div class="reg-success-icon"><i class="fa-solid fa-check"></i></div>
+    <h2 class="reg-success-title">Welcome to BizBrain!</h2>
+    <p class="reg-success-text">
+      Your account has been created successfully.<br />
+      <strong id="success-name" style="color:var(--accent)">User</strong>, you're now the owner of
+      <strong id="success-business" style="color:var(--accent-2)">your business</strong>.
+    </p>
+    <div class="spinner" style="margin:0 auto"></div>
+    <p style="font-size:12px;color:var(--txt-muted);margin-top:12px">Redirecting to dashboard...</p>
+  </div>
+</div>
+
+<!-- ─── JS ──────────────────────────────────────────────── -->
+<script>
+  // Expose removeLogo to inline onclick
+  window.Registration = null;
+</script>
+<script src="../js/registration.js"></script>
+</body>
+</html>

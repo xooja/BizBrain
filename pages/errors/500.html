@@ -1,0 +1,23 @@
+<div class="page-container error-page">
+  <div class="page-header">
+    <div>
+      <h1>500</h1>
+      <p class="page-subtitle">Something Went Wrong</p>
+    </div>
+  </div>
+  <div class="empty-state" style="padding:60px 20px">
+    <i class="fa-solid fa-bug" style="font-size:72px;color:var(--danger);opacity:0.3"></i>
+    <h2 style="margin-top:16px;font-size:22px;font-weight:700">Something Went Wrong</h2>
+    <p style="color:var(--txt-secondary);max-width:380px;margin:12px auto">
+      An unexpected error occurred. Please try refreshing the page or contact support if the issue persists.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="location.reload()">
+        <i class="fa-solid fa-rotate"></i> Refresh
+      </button>
+      <button class="btn btn-secondary" onclick="Router.navigate('dashboard')">
+        <i class="fa-solid fa-gauge-high"></i> Dashboard
+      </button>
+    </div>
+  </div>
+</div>

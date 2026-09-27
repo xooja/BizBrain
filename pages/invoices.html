@@ -1,0 +1,37 @@
+<!-- pages/invoices.html -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Invoices</h1>
+    <p class="page-subtitle">Create and manage client invoices</p>
+  </div>
+  <button class="btn btn-primary" onclick="openInvoiceModal()">
+    <i class="fa-solid fa-file-circle-plus"></i> New Invoice
+  </button>
+</div>
+
+<div class="table-wrap">
+  <div class="table-header">
+    <h3 class="table-title">All Invoices</h3>
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="invoice-search" placeholder="Search invoices…" />
+    </div>
+  </div>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Client</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Due Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="invoices-tbody">
+        <tr><td colspan="6"><div class="page-loader"><div class="spinner"></div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

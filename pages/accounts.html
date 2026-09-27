@@ -1,0 +1,194 @@
+<div class="page-container">
+
+  <style>
+    @media (max-width: 768px) {
+      .page-container .dash-grid { grid-template-columns: 1fr !important; }
+      .page-container .dash-grid .section-card { grid-column: 1 !important; }
+      .page-container .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; }
+      .page-container .page-header { flex-direction: column; align-items: stretch; }
+      .page-container .page-header .header-actions { flex-direction: column; align-items: stretch; }
+      .page-container .header-actions select,
+      .page-container .header-actions .search-box { width: 100% !important; min-width: 0 !important; }
+      .page-container .header-actions .btn { width: 100%; justify-content: center; }
+      .page-container .stat-card { padding: 16px; }
+      .page-container .stat-value { font-size: 20px; }
+      .page-container .section-header { flex-wrap: wrap; gap: 8px; padding: 16px; }
+      .page-container .section-body { padding: 8px 12px !important; }
+      .page-container .data-table th,
+      .page-container .data-table td { padding: 8px 8px !important; font-size: 12px; }
+      .page-container .table-footer { flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+      .page-container .pagination { gap: 2px; }
+      .page-container .page-btn { width: 28px; height: 28px; font-size: 11px; }
+      .page-container .quick-actions { grid-template-columns: repeat(2, 1fr) !important; }
+      .page-container .quick-action-btn { padding: 8px !important; font-size: 11px !important; }
+    }
+    @media (max-width: 480px) {
+      .page-container .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+      .page-container .stat-card { padding: 12px; }
+      .page-container .stat-value { font-size: 18px; }
+      .page-container .quick-actions { grid-template-columns: 1fr !important; }
+      .page-container .quick-action-btn { padding: 8px !important; font-size: 11px !important; }
+      .page-container .data-table th,
+      .page-container .data-table td { padding: 8px 8px !important; font-size: 12px; }
+      .page-container .cell-name { font-size: 12px; }
+      .page-container .cell-sub { font-size: 10px; }
+      .page-container .avatar.sm { width: 24px; height: 24px; font-size: 9px; }
+    }
+    /* Account-specific styles */
+    .acc-balance.positive { color: var(--success); font-weight: 600; }
+    .acc-balance.negative { color: var(--danger); font-weight: 600; }
+    .acc-balance.zero { color: var(--txt-muted); }
+    .acc-summary-mini { font-size: 13px; }
+    .acc-summary-mini .acc-sm-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0;
+    }
+    .acc-summary-mini .acc-sm-total { font-size: 15px; font-weight: 700; }
+    .acc-summary-bar {
+      height: 6px;
+      background: var(--bg-glass);
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .acc-summary-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .acc-insight-section { margin-bottom: 18px; }
+    .acc-insight-section:last-child { margin-bottom: 0; }
+    .acc-insight-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--txt-secondary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+
+  <!-- ─── PAGE HEADER ────────────────────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1>Accounts</h1>
+      <p class="page-subtitle">Financial summary and balances</p>
+    </div>
+    <div class="header-actions" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="refreshAccounts()">
+        <i class="fa-solid fa-rotate"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── STATS GRID (4 DASHBOARD WIDGETS) ─────────────────── -->
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon blue"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+      <div class="stat-value" id="acc-total-receivables">$0</div>
+      <div class="stat-label">Total Receivables</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon orange"><i class="fa-solid fa-truck-loading"></i></div>
+      <div class="stat-value" id="acc-total-payables">$0</div>
+      <div class="stat-label">Total Payables</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+      <div class="stat-value" id="acc-due-sales">$0</div>
+      <div class="stat-label">Due Sales</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon orange"><i class="fa-solid fa-bolt"></i></div>
+      <div class="stat-label" style="font-size:14px;font-weight:600;margin-bottom:12px">Quick Actions</div>
+      <div class="quick-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="quick-action-btn" onclick="refreshAccounts()" style="padding:10px;font-size:12px;gap:8px">
+          <i class="fa-solid fa-rotate" style="width:28px;height:28px;font-size:12px;background:rgba(59,130,246,0.15);color:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center"></i>
+          <span>Refresh</span>
+        </button>
+        <button class="quick-action-btn" onclick="exportAccountsData()" style="padding:10px;font-size:12px;gap:8px">
+          <i class="fa-solid fa-download" style="width:28px;height:28px;font-size:12px;background:rgba(16,185,129,0.15);color:var(--success);border-radius:6px;display:flex;align-items:center;justify-content:center"></i>
+          <span>Export</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN CONTENT GRID ─────────────────────────────────── -->
+  <div class="dash-grid">
+
+    <!-- ─── SUPPLIER BALANCES TABLE (LEFT) ──────────────────── -->
+    <div class="section-card" style="grid-column:1">
+      <div class="section-header">
+        <div class="section-title"><i class="fa-solid fa-truck" style="margin-right:8px;color:var(--accent)"></i>Supplier Balances</div>
+        <span style="font-size:12px;color:var(--txt-muted)" id="acc-supplier-count">0 suppliers</span>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Supplier</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="acc-suppliers-body">
+            <tr><td colspan="2"><div class="empty-state" style="padding:24px"><p>No supplier data</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── CUSTOMER BALANCES TABLE (RIGHT) ─────────────────── -->
+    <div class="section-card" style="grid-column:2">
+      <div class="section-header">
+        <div class="section-title"><i class="fa-solid fa-users" style="margin-right:8px;color:var(--accent-2)"></i>Customer Balances</div>
+        <span style="font-size:12px;color:var(--txt-muted)" id="acc-customer-count">0 customers</span>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="acc-customers-body">
+            <tr><td colspan="2"><div class="empty-state" style="padding:24px"><p>No customer data</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── FINANCIAL INSIGHTS PANEL ─────────────────────────── -->
+  <div class="dash-grid" style="margin-top:24px">
+    <div class="section-card dash-grid-full">
+      <div class="section-header">
+        <div class="section-title"><i class="fa-solid fa-chart-simple" style="margin-right:8px;color:var(--accent-2)"></i>Financial Overview</div>
+      </div>
+      <div class="section-body" style="padding:16px 24px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:16px">
+          <div style="padding:16px;background:var(--bg-glass);border:1px solid var(--border);border-radius:var(--radius-md);text-align:center">
+            <div style="font-size:10px;color:var(--txt-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Net Receivables</div>
+            <div style="font-size:20px;font-weight:800;font-family:var(--font-head);color:var(--success)" id="acc-net-receivables">$0</div>
+          </div>
+          <div style="padding:16px;background:var(--bg-glass);border:1px solid var(--border);border-radius:var(--radius-md);text-align:center">
+            <div style="font-size:10px;color:var(--txt-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Net Payables</div>
+            <div style="font-size:20px;font-weight:800;font-family:var(--font-head);color:var(--warning)" id="acc-net-payables">$0</div>
+          </div>
+          <div style="padding:16px;background:var(--bg-glass);border:1px solid var(--border);border-radius:var(--radius-md);text-align:center">
+            <div style="font-size:10px;color:var(--txt-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Cash Position</div>
+            <div style="font-size:20px;font-weight:800;font-family:var(--font-head);color:var(--accent)" id="acc-cash-position">$0</div>
+          </div>
+          <div style="padding:16px;background:var(--bg-glass);border:1px solid var(--border);border-radius:var(--radius-md);text-align:center">
+            <div style="font-size:10px;color:var(--txt-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Net Worth</div>
+            <div style="font-size:20px;font-weight:800;font-family:var(--font-head);color:var(--accent-2)" id="acc-net-worth">$0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

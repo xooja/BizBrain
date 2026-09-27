@@ -1,0 +1,170 @@
+/* ═══════════════════════════════════════════════════════════
+   BizBrain — tables.css
+═══════════════════════════════════════════════════════════ */
+
+/* ── Table Wrapper ───────────────────────────────────────── */
+.table-wrap {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.table-title {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--txt-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--transition);
+}
+
+.data-table th:hover { color: var(--txt-secondary); }
+.data-table th .sort-icon { margin-left: 4px; opacity: 0.4; }
+.data-table th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+.data-table tbody tr:last-child { border-bottom: none; }
+
+.data-table tbody tr:hover {
+  background: rgba(255,255,255,0.025);
+}
+
+.data-table td {
+  padding: 14px 16px;
+  color: var(--txt-primary);
+  vertical-align: middle;
+}
+
+.data-table td.muted { color: var(--txt-secondary); font-size: 13px; }
+
+/* ── Avatar Cell ─────────────────────────────────────────── */
+.cell-avatar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: white;
+}
+
+.avatar.sm { width: 28px; height: 28px; font-size: 11px; }
+.avatar.lg { width: 48px; height: 48px; font-size: 18px; }
+
+.cell-name  { font-weight: 500; font-size: 14px; }
+.cell-sub   { font-size: 12px; color: var(--txt-secondary); }
+
+/* ── Action Buttons ──────────────────────────────────────── */
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-btn {
+  width: 30px; height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-glass);
+  color: var(--txt-secondary);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  transition: all var(--transition);
+}
+
+.action-btn:hover { background: var(--bg-glass-hov); color: var(--txt-primary); }
+.action-btn.edit:hover  { border-color: var(--accent); color: var(--accent); }
+.action-btn.delete:hover { border-color: var(--danger); color: var(--danger); background: rgba(239,68,68,0.1); }
+.action-btn.view:hover  { border-color: var(--info);  color: var(--info); }
+
+/* ── Table Footer / Pagination ───────────────────────────── */
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--txt-secondary);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-btn {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-glass);
+  color: var(--txt-secondary);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  transition: all var(--transition);
+}
+
+.page-btn:hover { background: var(--bg-glass-hov); color: var(--txt-primary); }
+.page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Overflow scroll on mobile ───────────────────────────── */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+@media (max-width: 768px) {
+  .data-table th, .data-table td { padding: 10px 12px; }
+  .table-header { flex-direction: column; align-items: flex-start; }
+  .table-footer { flex-direction: column; align-items: flex-start; }
+}

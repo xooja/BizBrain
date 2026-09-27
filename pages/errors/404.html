@@ -1,0 +1,26 @@
+<div class="page-container error-page">
+  <div class="page-header">
+    <div>
+      <h1>404</h1>
+      <p class="page-subtitle">Page Not Found</p>
+    </div>
+  </div>
+  <div class="empty-state" style="padding:60px 20px">
+    <i class="fa-solid fa-map-signs" style="font-size:72px;color:var(--txt-muted);opacity:0.3"></i>
+    <h2 style="margin-top:16px;font-size:22px;font-weight:700">Page Not Found</h2>
+    <p style="color:var(--txt-secondary);max-width:380px;margin:12px auto">
+      The page you're looking for doesn't exist. It may have been moved, deleted, or the URL may be incorrect.
+    </p>
+    <p style="color:var(--txt-muted);font-size:13px;margin-bottom:8px">
+      <code style="background:var(--bg-glass);padding:4px 10px;border-radius:6px;font-size:13px" id="error-path">/unknown</code>
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="Router.navigate('dashboard')">
+        <i class="fa-solid fa-gauge-high"></i> Go to Dashboard
+      </button>
+      <button class="btn btn-secondary" onclick="history.back()">
+        <i class="fa-solid fa-arrow-left"></i> Go Back
+      </button>
+    </div>
+  </div>
+</div>

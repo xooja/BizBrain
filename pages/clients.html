@@ -1,0 +1,37 @@
+<!-- pages/clients.html -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Clients</h1>
+    <p class="page-subtitle">Manage your client relationships</p>
+  </div>
+  <button class="btn btn-primary" onclick="openClientModal()">
+    <i class="fa-solid fa-user-plus"></i> Add Client
+  </button>
+</div>
+
+<div class="table-wrap">
+  <div class="table-header">
+    <h3 class="table-title">All Clients</h3>
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="client-search" placeholder="Search clients…" />
+    </div>
+  </div>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Company</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Added</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="clients-tbody">
+        <tr><td colspan="6"><div class="page-loader"><div class="spinner"></div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

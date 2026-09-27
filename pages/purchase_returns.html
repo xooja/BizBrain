@@ -1,0 +1,121 @@
+<div class="page-container">
+
+  <style>
+    @media (max-width: 768px) {
+      .page-container .dash-grid { grid-template-columns: 1fr !important; }
+      .page-container .dash-grid .section-card { grid-column: 1 !important; }
+      .page-container .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; }
+      .page-container .page-header { flex-direction: column; align-items: stretch; }
+      .page-container .page-header .header-actions { flex-direction: column; align-items: stretch; }
+      .page-container .header-actions select,
+      .page-container .header-actions .search-box { width: 100% !important; min-width: 0 !important; }
+      .page-container .header-actions .btn { width: 100%; justify-content: center; }
+      .page-container .stat-card { padding: 16px; }
+      .page-container .stat-value { font-size: 20px; }
+      .page-container .section-header { flex-wrap: wrap; gap: 8px; padding: 16px; }
+      .page-container .section-body { padding: 8px 12px !important; }
+      .page-container .data-table th,
+      .page-container .data-table td { padding: 8px 8px !important; font-size: 12px; }
+      .page-container .table-footer { flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+      .page-container .pagination { gap: 2px; }
+      .page-container .page-btn { width: 28px; height: 28px; font-size: 11px; }
+      .page-container .quick-actions { grid-template-columns: repeat(2, 1fr) !important; }
+      .page-container .quick-action-btn { padding: 8px !important; font-size: 11px !important; }
+    }
+    @media (max-width: 480px) {
+      .page-container .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+      .page-container .stat-card { padding: 12px; }
+      .page-container .stat-value { font-size: 18px; }
+      .page-container .quick-actions { grid-template-columns: 1fr !important; }
+      .page-container .quick-action-btn { padding: 8px !important; font-size: 11px !important; }
+      .page-container .data-table th,
+      .page-container .data-table td { padding: 8px 8px !important; font-size: 12px; }
+      .page-container .cell-name { font-size: 12px; }
+      .page-container .cell-sub { font-size: 10px; }
+      .page-container .avatar.sm { width: 24px; height: 24px; font-size: 9px; }
+    }
+  </style>
+
+  <!-- ─── PAGE HEADER ────────────────────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1>Purchase Returns</h1>
+      <p class="page-subtitle">Return products to suppliers</p>
+    </div>
+    <div class="header-actions" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="search-box input-wrap" style="min-width:200px">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" id="preturn-search" placeholder="Search returns..." />
+      </div>
+      <button class="btn btn-primary" onclick="openPurchaseReturnModal()">
+        <i class="fa-solid fa-plus"></i> New Return
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── STATS GRID (4 DASHBOARD WIDGETS) ─────────────────── -->
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon blue"><i class="fa-solid fa-arrow-left"></i></div>
+      <div class="stat-value" id="preturn-total">0</div>
+      <div class="stat-label">Total Returns</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon orange"><i class="fa-solid fa-clock"></i></div>
+      <div class="stat-value" id="preturn-pending">$0</div>
+      <div class="stat-label">Pending Returns</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+      <div class="stat-value" id="preturn-this-month">$0</div>
+      <div class="stat-label">This Month</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon purple"><i class="fa-solid fa-bolt"></i></div>
+      <div class="stat-label" style="font-size:14px;font-weight:600;margin-bottom:12px">Quick Actions</div>
+      <div class="quick-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="quick-action-btn" onclick="openPurchaseReturnModal()" style="padding:10px;font-size:12px;gap:8px">
+          <i class="fa-solid fa-plus" style="width:28px;height:28px;font-size:12px;background:rgba(59,130,246,0.15);color:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center"></i>
+          <span>New Return</span>
+        </button>
+        <button class="quick-action-btn" onclick="exportPurchaseReturnData()" style="padding:10px;font-size:12px;gap:8px">
+          <i class="fa-solid fa-download" style="width:28px;height:28px;font-size:12px;background:rgba(16,185,129,0.15);color:var(--success);border-radius:6px;display:flex;align-items:center;justify-content:center"></i>
+          <span>Export CSV</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN CONTENT GRID ─────────────────────────────────── -->
+  <div class="dash-grid">
+    <div class="section-card dash-grid-full">
+      <div class="section-header">
+        <div class="section-title"><i class="fa-solid fa-arrow-left" style="margin-right:8px;color:var(--accent)"></i>Purchase Returns</div>
+        <span style="font-size:12px;color:var(--txt-muted)" id="preturn-count-label">0 returns</span>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Return #</th>
+              <th>Supplier</th>
+              <th>Date</th>
+              <th>Total</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="preturn-tbody">
+            <tr><td colspan="7"><div class="page-loader"><div class="spinner"></div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <span id="preturn-showing-label">Showing 0 of 0</span>
+        <div class="pagination" id="preturn-pagination"></div>
+      </div>
+    </div>
+  </div>
+
+</div>

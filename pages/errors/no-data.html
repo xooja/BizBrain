@@ -1,0 +1,23 @@
+<div class="page-container error-page">
+  <div class="page-header">
+    <div>
+      <h1>No Records Found</h1>
+      <p class="page-subtitle">No data available for the selected filters</p>
+    </div>
+  </div>
+  <div class="empty-state" style="padding:60px 20px">
+    <i class="fa-solid fa-database" style="font-size:72px;color:var(--txt-muted);opacity:0.2"></i>
+    <h2 style="margin-top:16px;font-size:22px;font-weight:700">No Records Found</h2>
+    <p style="color:var(--txt-secondary);max-width:380px;margin:12px auto">
+      No data available for the selected filters. Try adjusting your search criteria or clearing filters.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="btn-clear-filters">
+        <i class="fa-solid fa-eraser"></i> Clear Filters
+      </button>
+      <button class="btn btn-secondary" onclick="location.reload()">
+        <i class="fa-solid fa-rotate"></i> Refresh
+      </button>
+    </div>
+  </div>
+</div>

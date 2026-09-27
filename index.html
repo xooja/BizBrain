@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0d14" />
+  <meta name="description" content="BizBrain - Offline-First Business Management" />
+  <base href="__APP_BASE_PATH__" />
+  <title>BizBrain</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/app.css?v=5" />
+  <link rel="stylesheet" href="css/dashboard.css?v=30" />
+  <link rel="stylesheet" href="css/forms.css" />
+  <link rel="stylesheet" href="css/tables.css" />
+  <link rel="stylesheet" href="css/modules.css" />
+</head>
+<body>
+
+<!-- ─── LOGIN SCREEN ─────────────────────────────────────── -->
+<div id="login-screen" class="login-screen">
+  <div class="login-bg">
+    <div class="login-blob blob-1"></div>
+    <div class="login-blob blob-2"></div>
+    <div class="login-blob blob-3"></div>
+  </div>
+  <div class="login-card glass-card">
+    <div class="login-logo">
+      <div class="logo-icon"><i class="fa-solid fa-brain"></i></div>
+      <span class="logo-text">BizBrain</span>
+    </div>
+    <p class="login-tagline">Your business. Offline or online.</p>
+
+    <div id="login-error" class="alert alert-error" style="display:none"></div>
+
+    <div class="form-group">
+      <label for="login-email">Email</label>
+      <div class="input-wrap">
+        <i class="fa-solid fa-envelope"></i>
+        <input type="email" id="login-email" value="admin@bizbrain.com" placeholder="you@company.com" autocomplete="email" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="login-password">Password</label>
+      <div class="input-wrap">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" id="login-password" value="password" placeholder="••••••••" autocomplete="current-password" />
+        <button type="button" class="toggle-pw" onclick="togglePassword()"><i class="fa-solid fa-eye"></i></button>
+      </div>
+    </div>
+    <div class="form-row-check">
+      <label class="checkbox-label">
+        <input type="checkbox" id="remember-me" /> Remember me
+      </label>
+    </div>
+    <button class="btn btn-primary btn-full" id="login-btn" onclick="handleLogin()">
+      <span>Sign In</span>
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+    <p class="login-demo-hint">Demo: admin@bizbrain.com / password</p>
+    <p style="text-align:center;font-size:13px;color:var(--txt-secondary);margin-top:20px">
+      Don't have an account? <a href="pages/registration.html" style="color:var(--accent);text-decoration:none;font-weight:600">Create Business</a>
+    </p>
+  </div>
+</div>
+
+
+<!-- ─── APP SHELL ─────────────────────────────────────────── -->
+<div id="app-shell" class="app-shell" style="display:none">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon"><i class="fa-solid fa-brain"></i></div>
+        <span class="logo-text">BizBrain</span>
+      </div>
+      <button class="sidebar-close" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Navigation</div>
+      <a href="/dashboard"  class="nav-item" data-page="dashboard">
+        <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+      </a>
+      <a href="/reports"    class="nav-item" data-page="reports">
+        <i class="fa-solid fa-chart-line"></i><span>Reports</span>
+      </a>
+
+      <div class="nav-section-label">Business</div>
+      <a href="/purchase-invoices" class="nav-item" data-page="purchase_invoices">
+        <i class="fa-solid fa-cart-shopping"></i><span>Purchases</span>
+      </a>
+      <a href="/sales-invoices"    class="nav-item" data-page="sales_invoices">
+        <i class="fa-solid fa-file-invoice"></i><span>Sales Invoices</span>
+      </a>
+      <a href="/purchase-returns"  class="nav-item" data-page="purchase_returns">
+        <i class="fa-solid fa-arrow-left"></i><span>Purchase Returns</span>
+      </a>
+      <a href="/sales-returns"     class="nav-item" data-page="sales_returns">
+        <i class="fa-solid fa-arrow-right"></i><span>Sales Returns</span>
+      </a>
+
+      <div class="nav-section-label">Components</div>
+      <a href="/products"   class="nav-item" data-page="products">
+        <i class="fa-solid fa-boxes-stacked"></i><span>Products</span>
+      </a>
+      <a href="/categories" class="nav-item" data-page="categories">
+        <i class="fa-solid fa-tags"></i><span>Categories</span>
+      </a>
+      <a href="/suppliers"  class="nav-item" data-page="suppliers">
+        <i class="fa-solid fa-truck"></i><span>Suppliers</span>
+      </a>
+      <a href="/customers"  class="nav-item" data-page="customers">
+        <i class="fa-solid fa-people-group"></i><span>Customers</span>
+      </a>
+
+      <div class="nav-section-label">Finance</div>
+      <a href="/accounts"   class="nav-item" data-page="accounts">
+        <i class="fa-solid fa-chart-pie"></i><span>Accounts</span>
+      </a>
+      <a href="/expenses"   class="nav-item" data-page="expenses">
+        <i class="fa-solid fa-receipt"></i><span>Expenses</span>
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <a href="/team"       class="nav-item" data-page="team">
+        <i class="fa-solid fa-users-gear"></i><span>Team</span>
+      </a>
+      <a href="/settings"   class="nav-item" data-page="settings">
+        <i class="fa-solid fa-gear"></i><span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sync-status" id="sync-badge">
+        <span class="sync-dot online"></span>
+        <span id="sync-label">Synced</span>
+      </div>
+      <button class="btn-logout" onclick="handleLogout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Overlay -->
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <div class="main-wrap">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <div class="breadcrumb" id="breadcrumb">Dashboard</div>
+      </div>
+      <div class="header-right">
+        <div class="header-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="search" placeholder="Search menu..." aria-label="Search menu" />
+        </div>
+        <button class="header-icon-btn" type="button" aria-label="Notifications"><i class="fa-regular fa-bell"></i><span></span></button>
+        <div class="conn-badge" id="conn-badge">
+          <span class="conn-dot"></span>
+          <span id="conn-label">Online</span>
+        </div>
+        <div class="user-avatar" id="user-avatar">A</div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main id="page-content" class="page-content">
+      <div class="page-loader"><div class="spinner"></div></div>
+    </main>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     MODULE OVERLAY + SHEET — Profile Detail View (Supplier, etc.)
+     ════════════════════════════════════════════════════════════ -->
+<div id="module-overlay" class="module-overlay">
+  <div class="module-sheet" id="module-sheet" onclick="event.stopPropagation()">
+    <div class="module-handle"></div>
+
+    <!-- Header -->
+    <div class="module-header">
+      <div class="module-header-left">
+        <button class="module-list-toggle" id="module-list-toggle-btn" onclick="toggleSidebarPanel()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <button class="module-back-btn" onclick="closeModule()">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Back</span>
+        </button>
+        <h3 class="module-title" id="module-title">Profile</h3>
+      </div>
+      <div class="module-header-actions"></div>
+    </div>
+
+    <!-- Body -->
+    <div class="module-body" id="module-body">
+      <div class="module-empty" id="module-loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL ─────────────────────────────────────────────── -->
+
+<div id="modal-overlay" class="modal-overlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal glass-card" id="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">Modal</h3>
+      <button onclick="closeModal()" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="modal-body" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- ─── PIN VERIFICATION DIALOG ─────────────────────────────── -->
+<div id="pin-overlay" class="modal-overlay" style="display:none" onclick="event.stopPropagation()">
+  <div class="modal glass-card" id="pin-box" style="max-width:380px">
+    <div class="modal-header">
+      <h3 id="pin-title"><i class="fa-solid fa-shield-halved" style="margin-right:8px;color:var(--warning)"></i>Verify PIN</h3>
+      <button onclick="closePinDialog()" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="pin-body">
+      <p style="color:var(--txt-secondary);font-size:13px;margin-bottom:16px" id="pin-message">Enter your 4-digit PIN to confirm this action.</p>
+      <div class="form-group">
+        <label for="pin-input">Security PIN</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="pin-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="Enter 4-digit PIN" style="letter-spacing:6px;font-size:18px;font-weight:600" />
+        </div>
+      </div>
+      <div id="pin-error" style="color:var(--danger);font-size:12px;display:none;margin-top:8px"></div>
+      <div class="modal-footer" style="margin-top:20px">
+        <button class="btn btn-secondary" onclick="closePinDialog()">Cancel</button>
+        <button class="btn btn-primary" id="pin-submit-btn" onclick="submitPinDialog()">
+          <i class="fa-solid fa-check"></i> Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST ─────────────────────────────────────────────── -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- ─── JS ───────────────────────────────────────────────── -->
+<script src="js/db.js"></script>
+<script src="js/api.js?v=3"></script>
+<script src="js/auth.js"></script>
+<script src="js/connection-manager.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/router.js?v=18"></script>
+<script src="js/app.js?v=36"></script>
+<script src="js/modules.js"></script>
+</body>
+</html>

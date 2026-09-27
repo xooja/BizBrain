@@ -1,0 +1,442 @@
+<!-- ════════════════════════════════════════════════════════════
+     SUPPLIER PROFILE — 2-Panel Layout
+     Left: Supplier List (searchable) | Right: Dashboard-style Profile
+     ════════════════════════════════════════════════════════════ -->
+
+<div id="module-list-overlay" class="module-list-overlay" onclick="toggleSidebarPanel()"></div>
+
+<!-- ─── LEFT SIDEBAR: All Suppliers ────────────────────────────── -->
+<div class="module-list-panel" id="module-list-panel">
+  <div class="module-list-search">
+    <div class="input-wrap">
+      <i class="fa-solid fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--txt-muted);font-size:13px;pointer-events:none;z-index:1"></i>
+      <input type="text" id="sp-list-search" placeholder="Search suppliers..." oninput="filterSupplierList()" />
+    </div>
+  </div>
+  <div class="module-list-count">
+    <span id="sp-list-count">0 suppliers</span>
+  </div>
+  <div class="module-list-items" id="sp-list-items"></div>
+</div>
+
+<!-- ─── RIGHT MAIN PANEL: Supplier Profile Dashboard ──────────── -->
+<div class="module-main-panel" id="sp-main-panel">
+  <div class="module-main-inner" id="sp-main-inner">
+
+    <!-- ════ EMPTY STATE (no supplier selected) ════════════════ -->
+    <div id="sp-empty-state" class="sp-empty" style="padding:80px 20px">
+      <i class="fa-solid fa-truck" style="font-size:48px;opacity:0.2"></i>
+      <h3 style="color:var(--txt-secondary);margin-top:16px;font-size:18px">Select a Supplier</h3>
+      <p style="color:var(--txt-muted);font-size:13px">Choose a supplier from the left panel to view their profile, transactions, and details.</p>
+    </div>
+
+    <!-- ════ PROFILE CONTENT (dynamically shown) ═══════════════ -->
+    <div id="sp-profile-content" style="display:none">
+
+      <!-- ─── SUPPLIER HEADER ────────────────────────────────── -->
+      <div class="sp-header" id="sp-header">
+        <div class="sp-header-top">
+          <div class="sp-header-left">
+            <div class="sp-avatar-wrap">
+              <div class="avatar sp-avatar" id="sp-avatar">SP</div>
+              <div class="sp-avatar-status" id="sp-avatar-status"></div>
+            </div>
+            <div class="sp-header-info">
+              <h2 class="sp-name" id="sp-name">Supplier Name</h2>
+              <div class="sp-company" id="sp-company">Contact Person</div>
+            </div>
+          </div>
+          <div class="sp-header-actions">
+            <button class="btn btn-primary btn-sm" id="sp-action-purchase" onclick="spAction('purchase_invoice')">
+              <i class="fa-solid fa-cart-plus"></i> <span>New Purchase</span>
+            </button>
+            <div class="sp-more-wrap" id="sp-more-wrap">
+              <button class="btn btn-secondary btn-sm" id="sp-more-btn" onclick="toggleSupplierMenu()">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+              </button>
+              <div class="sp-more-menu" id="sp-more-menu">
+                <div class="sp-more-header">Transactions</div>
+                <button onclick="spAction('payment')"><i class="fa-solid fa-money-bill-wave"></i> Record Payment</button>
+                <button onclick="spAction('ledger')"><i class="fa-solid fa-book"></i> Open Ledger</button>
+                <button onclick="spAction('statement')"><i class="fa-solid fa-file-lines"></i> View Statement</button>
+                <div class="sp-more-divider"></div>
+                <div class="sp-more-header">Documents & Reports</div>
+                <button onclick="spAction('print')"><i class="fa-solid fa-print"></i> Print Statement</button>
+                <button onclick="spAction('upload')"><i class="fa-solid fa-upload"></i> Upload Document</button>
+                <div class="sp-more-divider"></div>
+                <div class="sp-more-header">Supplier Management</div>
+                <button onclick="spAction('block')"><i class="fa-solid fa-ban"></i> Block Supplier</button>
+                <button onclick="spAction('activate')" id="sp-action-activate" style="display:none"><i class="fa-solid fa-check-circle"></i> Activate Supplier</button>
+                <button onclick="spAction('archive')"><i class="fa-solid fa-box-archive"></i> Archive Supplier</button>
+                <div class="sp-more-divider"></div>
+                <button class="danger" onclick="spAction('delete')"><i class="fa-solid fa-trash"></i> Delete Supplier</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sp-header-meta" id="sp-header-meta">
+          <span class="sp-meta-item"><i class="fa-solid fa-phone"></i> <span id="sp-phone">—</span></span>
+          <span class="sp-meta-item"><i class="fa-brands fa-whatsapp"></i> <span id="sp-whatsapp">—</span></span>
+          <span class="sp-meta-item"><i class="fa-solid fa-city"></i> <span id="sp-city">—</span></span>
+          <span class="sp-meta-item"><i class="fa-solid fa-envelope"></i> <span id="sp-email">—</span></span>
+          <span class="sp-meta-item">
+            <span id="sp-status-badge" class="badge badge-success">Active</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- ─── DASHBOARD STATS CARDS ──────────────────────────── -->
+      <div class="sp-stats-grid" id="sp-stats-grid">
+        <div class="sp-stat-card">
+          <div class="sp-stat-icon blue"><i class="fa-solid fa-cart-shopping"></i></div>
+          <div class="sp-stat-value" id="sp-kpi-purchases">0</div>
+          <div class="sp-stat-label">Total Purchases</div>
+        </div>
+        <div class="sp-stat-card">
+          <div class="sp-stat-icon green"><i class="fa-solid fa-dollar-sign"></i></div>
+          <div class="sp-stat-value" id="sp-kpi-purchase-amount">$0</div>
+          <div class="sp-stat-label">Total Purchase Amount</div>
+        </div>
+        <div class="sp-stat-card">
+          <div class="sp-stat-icon purple"><i class="fa-solid fa-credit-card"></i></div>
+          <div class="sp-stat-value" id="sp-kpi-payments">$0</div>
+          <div class="sp-stat-label">Total Payments</div>
+        </div>
+        <div class="sp-stat-card">
+          <div class="sp-stat-icon red"><i class="fa-solid fa-clock"></i></div>
+          <div class="sp-stat-value" id="sp-kpi-outstanding">$0</div>
+          <div class="sp-stat-label">Outstanding Payable</div>
+        </div>
+        <div class="sp-stat-card">
+          <div class="sp-stat-icon orange"><i class="fa-solid fa-chart-line"></i></div>
+          <div class="sp-stat-value" id="sp-kpi-avg-order">$0</div>
+          <div class="sp-stat-label">Avg Order Value</div>
+        </div>
+      </div>
+
+      <!-- ─── TAB NAVIGATION ────────────────────────────────── -->
+      <div class="sp-tabs" id="sp-tabs">
+        <button class="sp-tab-btn active" data-sp-tab="overview" onclick="switchModuleTab('overview')"><i class="fa-solid fa-address-card"></i> Overview</button>
+        <button class="sp-tab-btn" data-sp-tab="purchase-history" onclick="switchModuleTab('purchase-history')"><i class="fa-solid fa-cart-shopping"></i> Purchases</button>
+        <button class="sp-tab-btn" data-sp-tab="ledger" onclick="switchModuleTab('ledger')"><i class="fa-solid fa-book"></i> Ledger</button>
+        <button class="sp-tab-btn" data-sp-tab="payments" onclick="switchModuleTab('payments')"><i class="fa-solid fa-credit-card"></i> Payments</button>
+        <button class="sp-tab-btn" data-sp-tab="products-purchased" onclick="switchModuleTab('products-purchased')"><i class="fa-solid fa-cube"></i> Products</button>
+        <button class="sp-tab-btn" data-sp-tab="documents" onclick="switchModuleTab('documents')"><i class="fa-solid fa-folder"></i> Documents</button>
+        <button class="sp-tab-btn" data-sp-tab="activity" onclick="switchModuleTab('activity')"><i class="fa-solid fa-clock-rotate-left"></i> Activity</button>
+        <button class="sp-tab-btn" data-sp-tab="settings" onclick="switchModuleTab('settings')"><i class="fa-solid fa-gear"></i> Settings</button>
+      </div>
+
+      <!-- ════════ TAB CONTENT ══════════════════════════════════ -->
+
+      <!-- ─── OVERVIEW ───────────────────────────────────────── -->
+      <div class="sp-tab-content" id="sp-tab-overview">
+        <div class="sp-overview-grid">
+          <div class="sp-section-card">
+            <div class="sp-section-title"><i class="fa-solid fa-coins"></i> Financial Summary</div>
+            <div class="sp-info-grid">
+              <div class="sp-info-item">
+                <span class="sp-info-label">Current Balance</span>
+                <span class="sp-info-value" id="sp-ov-balance">$0.00</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">Credit Limit</span>
+                <span class="sp-info-value" id="sp-ov-credit-limit">$0.00</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">Available Credit</span>
+                <span class="sp-info-value" id="sp-ov-avail-credit">$0.00</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">Balance Type</span>
+                <span class="sp-info-value" id="sp-ov-balance-type">Payable</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">Last Purchase</span>
+                <span class="sp-info-value" id="sp-ov-last-purchase">—</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">Supplier Since</span>
+                <span class="sp-info-value" id="sp-ov-created">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="sp-section-card">
+            <div class="sp-section-title"><i class="fa-solid fa-address-book"></i> Contact Details</div>
+            <div class="sp-info-grid">
+              <div class="sp-info-item">
+                <span class="sp-info-label">Contact Person</span>
+                <span class="sp-info-value" id="sp-ov-contact">—</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">Phone</span>
+                <span class="sp-info-value" id="sp-ov-phone">—</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">WhatsApp</span>
+                <span class="sp-info-value" id="sp-ov-whatsapp">—</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">Email</span>
+                <span class="sp-info-value" id="sp-ov-email">—</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">Company</span>
+                <span class="sp-info-value" id="sp-ov-company">—</span>
+              </div>
+              <div class="sp-info-item">
+                <span class="sp-info-label">City</span>
+                <span class="sp-info-value" id="sp-ov-city">—</span>
+              </div>
+              <div class="sp-info-item sp-info-full">
+                <span class="sp-info-label">Address</span>
+                <span class="sp-info-value" id="sp-ov-address">—</span>
+              </div>
+              <div class="sp-info-item sp-info-full">
+                <span class="sp-info-label">Notes</span>
+                <span class="sp-info-value" id="sp-ov-notes">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── PURCHASE HISTORY ──────────────────────────────── -->
+      <div class="sp-tab-content" id="sp-tab-purchase-history" style="display:none">
+        <div class="sp-tab-toolbar">
+          <div class="input-wrap" style="width:200px">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" class="sp-tab-search" placeholder="Search invoices..." id="sp-ph-search" oninput="spFilterPurchases()" />
+          </div>
+          <input type="date" class="sp-date-input" id="sp-ph-from" onchange="spFilterPurchases()" />
+          <span style="color:var(--txt-muted)">to</span>
+          <input type="date" class="sp-date-input" id="sp-ph-to" onchange="spFilterPurchases()" />
+          <span class="sp-tab-count" id="sp-ph-count">0 invoices</span>
+        </div>
+        <div class="sp-table-wrap">
+          <table class="data-table sp-table">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th style="text-align:right">Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sp-ph-tbody">
+              <tr><td colspan="6"><div class="sp-empty"><i class="fa-solid fa-cart-shopping"></i><p>No purchase history</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── LEDGER ────────────────────────────────────────── -->
+      <div class="sp-tab-content" id="sp-tab-ledger" style="display:none">
+        <div class="sp-tab-toolbar">
+          <div class="sp-ledger-export">
+            <span style="font-size:12px;color:var(--txt-muted)">Export:</span>
+            <button class="btn btn-secondary btn-xs" onclick="spExportLedger('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button class="btn btn-secondary btn-xs" onclick="spExportLedger('excel')"><i class="fa-solid fa-file-excel"></i> Excel</button>
+            <button class="btn btn-secondary btn-xs" onclick="spExportLedger('csv')"><i class="fa-solid fa-file-csv"></i> CSV</button>
+            <button class="btn btn-secondary btn-xs" onclick="spExportLedger('print')"><i class="fa-solid fa-print"></i> Print</button>
+          </div>
+          <span class="sp-tab-count" id="sp-ledger-count">0 entries</span>
+        </div>
+        <div class="sp-table-wrap">
+          <table class="data-table sp-table sp-ledger-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Reference / Description</th>
+                <th style="text-align:right">Debit</th>
+                <th style="text-align:right">Credit</th>
+                <th style="text-align:right">Balance</th>
+              </tr>
+            </thead>
+            <tbody id="sp-ledger-tbody">
+              <tr><td colspan="5"><div class="sp-empty"><i class="fa-solid fa-book"></i><p>No ledger entries yet</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── PAYMENTS ──────────────────────────────────────── -->
+      <div class="sp-tab-content" id="sp-tab-payments" style="display:none">
+        <div class="sp-tab-toolbar">
+          <span class="sp-tab-count" id="sp-payments-count">0 payments</span>
+        </div>
+        <div class="sp-table-wrap">
+          <table class="data-table sp-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Reference</th>
+                <th style="text-align:right">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="sp-payments-tbody">
+              <tr><td colspan="4"><div class="sp-empty"><i class="fa-solid fa-credit-card"></i><p>No payments recorded</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── PRODUCTS PURCHASED ────────────────────────────── -->
+      <div class="sp-tab-content" id="sp-tab-products-purchased" style="display:none">
+        <div class="sp-tab-toolbar">
+          <span class="sp-tab-count" id="sp-products-count">0 products</span>
+        </div>
+        <div class="sp-table-wrap">
+          <table class="data-table sp-table">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th style="text-align:right">Total Qty</th>
+                <th style="text-align:right">Avg Cost</th>
+                <th>Last Purchase Date</th>
+                <th style="text-align:right">Last Price</th>
+              </tr>
+            </thead>
+            <tbody id="sp-products-tbody">
+              <tr><td colspan="5"><div class="sp-empty"><i class="fa-solid fa-cube"></i><p>No products purchased yet</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── DOCUMENTS ─────────────────────────────────────── -->
+      <div class="sp-tab-content" id="sp-tab-documents" style="display:none">
+        <div class="sp-docs-grid">
+          <div class="sp-section-card">
+            <div class="sp-section-title"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Document</div>
+            <div class="sp-drop-zone" id="sp-drop-zone">
+              <i class="fa-solid fa-cloud-arrow-up sp-drop-icon"></i>
+              <p class="sp-drop-text">Drag & drop files here or click to browse</p>
+              <span class="sp-drop-hint">CNIC, Agreements, Tax Documents, Other Files</span>
+              <input type="file" id="sp-file-input" multiple accept=".pdf,.jpg,.png,.doc,.docx" style="display:none" />
+            </div>
+          </div>
+          <div class="sp-section-card">
+            <div class="sp-section-title"><i class="fa-solid fa-folder-open"></i> Uploaded Documents</div>
+            <div id="sp-docs-list">
+              <div class="sp-empty"><i class="fa-solid fa-folder"></i><p>No documents uploaded yet</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ACTIVITY LOG ──────────────────────────────────── -->
+      <div class="sp-tab-content" id="sp-tab-activity" style="display:none">
+        <div class="sp-timeline" id="sp-timeline">
+          <div class="sp-empty"><i class="fa-solid fa-clock-rotate-left"></i><p>No activity recorded yet</p></div>
+        </div>
+      </div>
+
+      <!-- ─── SETTINGS ──────────────────────────────────────── -->
+      <div class="sp-tab-content" id="sp-tab-settings" style="display:none">
+        <div class="sp-settings-form">
+          <div class="sp-section-card">
+            <div class="sp-section-title"><i class="fa-solid fa-gear"></i> Edit Supplier</div>
+            <div class="sp-form-grid">
+              <div class="form-group">
+                <label>Supplier Name <span class="required">*</span></label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-user"></i>
+                  <input type="text" id="sp-settings-name" placeholder="Supplier name" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Contact Person</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-building"></i>
+                  <input type="text" id="sp-settings-company" placeholder="Contact person name" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-phone"></i>
+                  <input type="text" id="sp-settings-phone" placeholder="Phone number" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>WhatsApp</label>
+                <div class="input-wrap">
+                  <i class="fa-brands fa-whatsapp"></i>
+                  <input type="text" id="sp-settings-whatsapp" placeholder="WhatsApp number" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-envelope"></i>
+                  <input type="email" id="sp-settings-email" placeholder="Email address" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>City</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-city"></i>
+                  <input type="text" id="sp-settings-city" placeholder="City" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Opening Balance</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-coins"></i>
+                  <input type="number" id="sp-settings-opening-balance" placeholder="0" step="0.01" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Balance Type</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                  <select id="sp-settings-balance-type">
+                    <option value="payable">Payable (I owe)</option>
+                    <option value="receivable">Receivable (They owe)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Credit Limit</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-credit-card"></i>
+                  <input type="number" id="sp-settings-credit-limit" placeholder="0" step="0.01" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-toggle-on"></i>
+                  <select id="sp-settings-status">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group sp-form-full">
+                <label>Address</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-location-dot"></i>
+                  <input type="text" id="sp-settings-address" placeholder="Full address" />
+                </div>
+              </div>
+              <div class="form-group sp-form-full">
+                <label>Notes</label>
+                <textarea id="sp-settings-notes" rows="3" placeholder="Additional notes"></textarea>
+              </div>
+            </div>
+            <div class="sp-settings-actions">
+              <button class="btn btn-primary" onclick="saveSupplierSettings()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+              <button class="btn btn-secondary" onclick="switchModuleTab('overview')"><i class="fa-solid fa-xmark"></i> Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sp-profile-content -->
+
+  </div><!-- /sp-main-inner -->
+</div><!-- /sp-main-panel -->

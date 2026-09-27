@@ -1,0 +1,42 @@
+<!-- ════════════════════════════════════════════════════════════
+     MODULES.HTML — Shopify-style Slide-Up Module Sheet
+     Loaded dynamically by modules.js
+     ════════════════════════════════════════════════════════════ -->
+
+<div id="module-overlay" class="module-overlay">
+  <div class="module-sheet" id="module-sheet" onclick="event.stopPropagation()">
+
+    <!-- Drag Handle (mobile swipe) -->
+    <div class="module-handle" id="module-handle"></div>
+
+    <!-- Header -->
+    <div class="module-header">
+      <div class="module-header-left">
+        <button class="module-back-btn" onclick="closeModule()">
+          <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+        </button>
+        <h3 class="module-title" id="module-title">Module</h3>
+      </div>
+      <div class="module-header-actions" id="module-header-actions">
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="module-body">
+      <!-- Sidebar -->
+      <nav class="module-sidebar" id="module-sidebar"></nav>
+      <!-- Content -->
+      <div class="module-content" id="module-content">
+        <div class="module-skeleton" id="module-skeleton">
+          <div class="module-skeleton-line"></div>
+          <div class="module-skeleton-line"></div>
+          <div class="module-skeleton-line"></div>
+          <div class="module-skeleton-line"></div>
+          <div class="module-skeleton-line"></div>
+        </div>
+        <div class="module-content-inner" id="module-content-inner"></div>
+      </div>
+    </div>
+
+  </div>
+</div>

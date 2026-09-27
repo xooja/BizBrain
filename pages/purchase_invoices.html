@@ -1,0 +1,538 @@
+<!-- pages/purchase_invoices.html -->
+<div class="page-container">
+
+  <style>
+    @media (max-width: 768px) {
+      .page-container .dash-grid { grid-template-columns: 1fr !important; }
+      .page-container .dash-grid .section-card { grid-column: 1 !important; }
+      .page-container .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; }
+      .page-container .page-header { flex-direction: column; align-items: stretch; }
+      .page-container .page-header .header-actions { flex-direction: column; align-items: stretch; }
+      .page-container .header-actions select,
+      .page-container .header-actions .search-bar,
+      .page-container .header-actions .search-box,
+      .page-container .header-actions .input-wrap { width: 100% !important; min-width: 0 !important; }
+      .page-container .header-actions .btn { width: 100%; justify-content: center; }
+      .page-container .stat-card { padding: 16px; }
+      .page-container .stat-value { font-size: 20px; }
+      .page-container .section-header { flex-wrap: wrap; gap: 8px; padding: 16px; }
+      .page-container .section-body { padding: 8px 12px !important; }
+      .page-container .data-table th,
+      .page-container .data-table td { padding: 8px 8px !important; font-size: 12px; }
+      .page-container .pagination { gap: 2px; }
+      .page-container .page-btn { width: 28px; height: 28px; font-size: 11px; }
+      .page-container .table-footer { flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+      .page-container .quick-actions { grid-template-columns: repeat(2, 1fr) !important; }
+      .page-container .quick-action-btn { padding: 8px !important; font-size: 11px !important; }
+      .page-container .cell-name { font-size: 12px; }
+      .page-container .cell-sub { font-size: 10px; }
+      .page-container .avatar.sm { width: 24px; height: 24px; font-size: 9px; }
+      .page-container .inv-summary-row { flex-direction: column; }
+      .page-container .inv-summary-card { min-width: auto; width: 100%; }
+      .page-container .fs-modal { margin: 10px auto; max-height: calc(100vh - 20px); }
+      .page-container .fs-modal-body { padding: 16px; }
+      .page-container .fs-modal-overlay { padding: 10px; }
+      .page-container .supplier-row { flex-direction: column; }
+      .page-container .inv-table { font-size: 13px; }
+      .page-container .inv-table th,
+      .page-container .inv-table td { padding: 4px 6px; }
+      .page-container .recs-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .page-container .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+      .page-container .stat-card { padding: 12px; }
+      .page-container .stat-value { font-size: 18px; }
+      .page-container .quick-actions { grid-template-columns: 1fr !important; }
+      .page-container .quick-action-btn { padding: 8px !important; font-size: 11px !important; }
+      .page-container .inv-table th,
+      .page-container .inv-table td { padding: 4px 4px !important; font-size: 11px; }
+    }
+    /* ── Purchase Invoice specific ─────────────────────────── */
+    .pi-insight-section { margin-bottom: 18px; }
+    .pi-insight-section:last-child { margin-bottom: 0; }
+    .pi-insight-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--txt-secondary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pi-insight-card {
+      padding: 10px 12px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pi-insight-card:last-child { margin-bottom: 0; }
+    .pi-insight-name { font-size: 13px; font-weight: 500; }
+    .pi-insight-sub { font-size: 11px; color: var(--txt-muted); margin-top: 1px; }
+    .pi-insight-amount { font-size: 14px; font-weight: 700; }
+    .pi-summary-mini { font-size: 13px; }
+    .pi-summary-mini .pi-sm-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0;
+    }
+    .pi-summary-mini .pi-sm-total { font-size: 15px; font-weight: 700; }
+    .pi-summary-bar {
+      height: 6px;
+      background: var(--bg-glass);
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .pi-summary-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .pi-pending-alert {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--danger);
+      margin-bottom: 6px;
+    }
+    .pi-pending-alert:last-child { margin-bottom: 0; }
+  </style>
+
+  <!-- ─── PAGE HEADER ────────────────────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1>Purchase Invoices</h1>
+      <p class="page-subtitle">Manage and track all purchase invoices</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="search-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="purchase-search" placeholder="Search invoices…" />
+      </div>
+      <button class="btn btn-primary" onclick="Router.navigate('purchase_invoices_create')" id="pi-new-btn">
+        <i class="fa-solid fa-plus"></i> New Purchase Invoice
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── STATS GRID (4 DASHBOARD WIDGETS) ─────────────────── -->
+  <div class="stats-grid">
+    <!-- 1. Total Purchase Invoices -->
+    <div class="stat-card blue">
+      <div class="stat-icon blue"><i class="fa-solid fa-receipt"></i></div>
+      <div class="stat-value" id="pi-total-invoices">0</div>
+      <div class="stat-label">Total Purchase Invoices</div>
+      <div class="stat-change up" id="pi-total-change"><i class="fa-solid fa-arrow-up"></i> 0% vs prev month</div>
+    </div>
+
+    <!-- 2. Pending Payments -->
+    <div class="stat-card orange">
+      <div class="stat-icon orange"><i class="fa-solid fa-clock"></i></div>
+      <div class="stat-value" id="pi-last-month">$0</div>
+      <div class="stat-label">Pending Payments</div>
+      <div class="stat-change up" id="pi-last-month-change"><i class="fa-solid fa-arrow-up"></i> 0% vs prev month</div>
+    </div>
+
+    <!-- 3. Paid This Month -->
+    <div class="stat-card green">
+      <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+      <div class="stat-value" id="pi-this-month">$0</div>
+      <div class="stat-label">Paid This Month</div>
+      <div class="stat-change up" id="pi-this-month-change"><i class="fa-solid fa-arrow-up"></i> 0% from last month</div>
+    </div>
+
+    <!-- 4. Quick Actions -->
+    <div class="stat-card orange">
+      <div class="stat-icon orange"><i class="fa-solid fa-bolt"></i></div>
+      <div class="stat-label" style="font-size:14px;font-weight:600;margin-bottom:12px">Quick Actions</div>
+      <div class="quick-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="quick-action-btn" onclick="Router.navigate('purchase_invoices_create')" style="padding:10px;font-size:12px;gap:8px">
+          <i class="fa-solid fa-plus" style="width:28px;height:28px;font-size:12px;background:rgba(59,130,246,0.15);color:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center"></i>
+          <span>New Invoice</span>
+        </button>
+        <button class="quick-action-btn" onclick="document.getElementById('pi-table-section')?.scrollIntoView({behavior:'smooth'})" style="padding:10px;font-size:12px;gap:8px">
+          <i class="fa-solid fa-list" style="width:28px;height:28px;font-size:12px;background:rgba(139,92,246,0.15);color:var(--accent-2);border-radius:6px;display:flex;align-items:center;justify-content:center"></i>
+          <span>View All</span>
+        </button>
+        <button class="quick-action-btn" onclick="exportPiData()" style="padding:10px;font-size:12px;gap:8px">
+          <i class="fa-solid fa-download" style="width:28px;height:28px;font-size:12px;background:rgba(16,185,129,0.15);color:var(--success);border-radius:6px;display:flex;align-items:center;justify-content:center"></i>
+          <span>Export CSV</span>
+        </button>
+        <button class="quick-action-btn" onclick="window.print()" style="padding:10px;font-size:12px;gap:8px">
+          <i class="fa-solid fa-print" style="width:28px;height:28px;font-size:12px;background:rgba(245,158,11,0.15);color:var(--warning);border-radius:6px;display:flex;align-items:center;justify-content:center"></i>
+          <span>Print Report</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── RECOMMENDATIONS PANEL ─────────────────────────────── -->
+  <div class="dash-grid" style="margin-bottom:24px">
+    <div class="section-card dash-grid-full">
+      <div class="section-header">
+        <h3 class="section-title"><i class="fa-solid fa-lightbulb" style="color:var(--warning);margin-right:8px"></i> Recommendations</h3>
+      </div>
+      <div class="section-body">
+        <div class="recs-grid" id="purchase-recs">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN CONTENT GRID ─────────────────────────────────── -->
+  <div class="dash-grid">
+
+    <!-- ─── PURCHASE INVOICE TABLE (LEFT) ───────────────────── -->
+    <div class="section-card" id="pi-table-section" style="grid-column:1">
+      <div class="section-header">
+        <div class="section-title"><i class="fa-solid fa-receipt" style="margin-right:8px;color:var(--accent)"></i>Purchase Invoices</div>
+        <span style="font-size:12px;color:var(--txt-muted)" id="pi-count-label">0 invoices</span>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Supplier</th>
+              <th>Date</th>
+              <th>Total</th>
+              <th>Paid</th>
+              <th>Balance</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="purchases-tbody">
+            <tr><td colspan="8"><div class="page-loader"><div class="spinner"></div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── INSIGHTS (RIGHT SIDEBAR) ────────────────────────── -->
+    <div class="section-card" style="grid-column:2">
+      <div class="section-header">
+        <div class="section-title"><i class="fa-solid fa-chart-simple" style="margin-right:8px;color:var(--accent-2)"></i>Overview</div>
+      </div>
+      <div class="section-body" style="padding:16px">
+
+        <div class="pi-insight-section">
+          <div class="pi-insight-title"><i class="fa-solid fa-calculator" style="color:var(--accent)"></i> Payment Summary</div>
+          <div style="padding:10px 12px;background:var(--bg-glass);border:1px solid var(--border);border-radius:var(--radius-md)">
+            <div class="pi-summary-mini">
+              <div class="pi-sm-row"><span>Total Invoiced</span><strong id="pi-sm-invoiced">$0</strong></div>
+              <div class="pi-sm-row"><span>Total Paid</span><strong id="pi-sm-paid" style="color:var(--success)">$0</strong></div>
+              <div class="pi-sm-row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px">
+                <span>Outstanding</span>
+                <strong class="pi-sm-total" id="pi-sm-credit" style="color:var(--warning)">$0</strong>
+              </div>
+            </div>
+            <div class="pi-summary-bar">
+              <div class="pi-summary-bar-fill" id="pi-payment-bar" style="width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2))"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pi-insight-section">
+          <div class="pi-insight-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--info)"></i> Recent Invoices</div>
+          <div id="pi-recent-list">
+            <div class="empty-state" style="padding:12px"><p style="font-size:12px">No recent invoices</p></div>
+          </div>
+        </div>
+
+        <div class="pi-insight-section">
+          <div class="pi-insight-title"><i class="fa-solid fa-trophy" style="color:var(--warning)"></i> Top Suppliers</div>
+          <div id="pi-top-suppliers">
+            <div class="empty-state" style="padding:12px"><p style="font-size:12px">No supplier data</p></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- EXISTING MODALS (UNTOUCHED)                                -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+
+  <div id="pi-fullscreen-modal" class="fs-modal-overlay" style="display:none" onclick="if(event.target===this)closePiModal()">
+    <div class="fs-modal">
+      <div class="fs-modal-header">
+        <h2><i class="fa-solid fa-cart-plus"></i> <span id="pi-modal-title">New Purchase Invoice</span></h2>
+        <div class="pi-page-actions">
+          <button class="btn btn-sm btn-secondary" type="button" onclick="closePiModal()">Cancel</button>
+          <button class="btn btn-sm btn-secondary" type="button" onclick="savePiDraft()"><i class="fa-regular fa-floppy-disk"></i> Save Draft</button>
+          <button class="btn btn-sm btn-primary" type="button" onclick="confirmPiInvoice()"><i class="fa-solid fa-floppy-disk"></i> Save &amp; Submit</button>
+        </div>
+      </div>
+      <div class="fs-modal-body">
+        <div class="pi-meta-grid">
+        <div class="inv-section pi-invoice-details-section">
+          <h3 class="inv-section-title"><i class="fa-solid fa-file-invoice"></i> Invoice Details</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pi-invoice-no">Invoice Number</label>
+              <input type="text" id="pi-invoice-no" class="pi-input" placeholder="Auto-generated if empty" onblur="validatePiInvoiceNumber()" />
+              <small id="pi-invoice-no-status" style="display:block;margin-top:5px;color:var(--txt-muted)"></small>
+            </div>
+            <div class="form-group">
+              <label for="pi-invoice-date">Invoice Date &amp; Time <span class="required">*</span></label>
+              <input type="datetime-local" id="pi-invoice-date" class="pi-input" />
+            </div>
+            <div class="form-group">
+              <label for="pi-reference">Reference No <span class="required">*</span></label>
+              <input type="text" id="pi-reference" class="pi-input" placeholder="PO-00000" />
+            </div>
+            <div class="form-group">
+              <label for="pi-currency">Currency</label>
+              <select id="pi-currency" class="pi-input"><option>PKR - Pakistani Rupee</option><option>USD - US Dollar</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="inv-section pi-supplier-section">
+          <h3 class="inv-section-title"><i class="fa-solid fa-truck"></i> Supplier</h3>
+          <div class="supplier-row">
+            <div class="supplier-select-wrap">
+              <label>Select Supplier <span class="required">*</span></label>
+              <div class="searchable-select" id="supplier-ss">
+                <input type="text" id="pi-supplier-search" class="ss-input" placeholder="Type to search suppliers…" autocomplete="off" oninput="filterSuppliers()" onfocus="openSupplierDropdown()" />
+                <div class="ss-dropdown" id="pi-supplier-dropdown" style="display:none"></div>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-secondary pi-add-supplier-btn" type="button" onclick="event.stopPropagation();closeSupplierDropdown();openAddSupplierNested()" style="margin-top:24px;white-space:nowrap">
+              <i class="fa-solid fa-plus"></i> Add Supplier
+            </button>
+          </div>
+          <div id="pi-supplier-info" class="supplier-info" style="display:none">
+            <div class="supplier-info-avatar" id="pi-supplier-avatar">S</div>
+            <div>
+              <div class="supplier-info-name" id="pi-supplier-name">—</div>
+              <div class="supplier-info-detail" id="pi-supplier-phone"></div>
+              <div class="supplier-info-detail" id="pi-supplier-address"></div>
+            </div>
+            <button class="btn btn-sm btn-secondary" onclick="clearSupplier()" style="margin-left:auto" title="Change supplier"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="pi-supplier-extra">
+            <div class="form-group">
+              <label for="pi-supplier-address-field">Supplier Address</label>
+              <textarea id="pi-supplier-address-field" class="pi-input" rows="2" placeholder="Supplier address"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="pi-payment-term">Payment Term</label>
+              <select id="pi-payment-term" class="pi-input"><option>30 Days</option><option>15 Days</option><option>Cash</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="inv-section pi-other-details-section">
+          <h3 class="inv-section-title"><i class="fa-solid fa-sliders"></i> Other Details</h3>
+          <div class="form-group">
+            <label for="pi-warehouse">Warehouse</label>
+            <select id="pi-warehouse" class="pi-input"><option>Main Warehouse</option><option>Secondary Warehouse</option></select>
+          </div>
+          <div class="form-group">
+            <label for="pi-purchase-type">Purchase Type</label>
+            <select id="pi-purchase-type" class="pi-input"><option>Local Purchase</option><option>Import Purchase</option></select>
+          </div>
+          <div class="form-group">
+            <label for="pi-due-date">Due Date</label>
+            <input type="date" id="pi-due-date" class="pi-input" />
+          </div>
+          <div class="form-group">
+            <label for="pi-other-notes">Notes</label>
+            <textarea id="pi-other-notes" class="pi-input" rows="2" placeholder="Enter notes (optional)"></textarea>
+          </div>
+        </div>
+        </div>
+        <div class="inv-section pi-items-section">
+          <div class="pi-items-header">
+            <div>
+              <h3 class="inv-section-title"><i class="fa-solid fa-boxes-stacked"></i> Add Product</h3>
+            </div>
+            <div class="pi-items-actions">
+              <button class="btn btn-sm btn-secondary" type="button" onclick="openPiBarcodeScanner()"><i class="fa-solid fa-barcode"></i> Scan Barcode</button>
+            </div>
+          </div>
+          <div class="pi-product-entry" id="pi-product-entry">
+            <div class="pi-entry-heading">Add Product</div>
+            <div class="pi-entry-grid">
+              <div class="pi-entry-field pi-entry-product">
+                <label for="pi-entry-product">Product</label>
+                <div class="pi-prod-wrap">
+                  <input type="text" id="pi-entry-product" class="pi-prod-input" placeholder="Search product by name, SKU or barcode…" autocomplete="off" oninput="piEntrySearch()" onfocus="piEntrySearch()" onblur="setTimeout(closePiEntryDropdown,200)" />
+                  <div class="pi-prod-dropdown" id="pi-entry-dropdown" style="display:none"></div>
+                </div>
+              </div>
+              <div class="pi-entry-field"><label for="pi-entry-barcode">Barcode</label><input id="pi-entry-barcode" class="pi-num-input" placeholder="Barcode" /></div>
+              <div class="pi-entry-field pi-entry-qty"><label for="pi-entry-qty">Qty</label><input id="pi-entry-qty" class="pi-num-input" type="number" min="0.01" step="any" value="1" /></div>
+              <div class="pi-entry-field pi-entry-unit"><label for="pi-entry-unit">Unit</label><select id="pi-entry-unit" class="pi-num-input"><option value="pcs">Pcs</option><option value="kg">Kg</option><option value="gram">Gram</option><option value="ltr">Ltr</option><option value="meter">Meter</option><option value="box">Box</option><option value="pack">Pack</option></select></div>
+              <div class="pi-entry-field"><label for="pi-entry-purchase">Purchase Rate</label><input id="pi-entry-purchase" class="pi-num-input" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="pi-entry-field"><label for="pi-entry-discount">P. Discount</label><input id="pi-entry-discount" class="pi-num-input" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="pi-entry-field"><label for="pi-entry-sale">Sale Rate</label><input id="pi-entry-sale" class="pi-num-input" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="pi-entry-field"><label for="pi-entry-sale-discount">S. Discount</label><input id="pi-entry-sale-discount" class="pi-num-input" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="pi-entry-field"><label for="pi-entry-tax">Tax %</label><input id="pi-entry-tax" class="pi-num-input" type="number" min="0" step="0.01" value="0" /></div>
+              <button class="btn btn-primary pi-entry-add" id="pi-entry-submit" type="button" onclick="addPiEntryProduct()"><i class="fa-solid fa-plus"></i> Add Product</button>
+            </div>
+          </div>
+          <div class="pi-items-list-header">
+            <div>
+              <h3 class="inv-section-title"><i class="fa-solid fa-boxes-stacked"></i> Purchase Items</h3>
+              <span class="pi-item-count" id="pi-item-count">0 items</span>
+            </div>
+          </div>
+          <div class="inv-table-wrap">
+            <table class="inv-table" id="pi-products-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Product</th><th>Qty</th><th>Unit</th><th>Purchase Rate</th>
+                  <th>Purchase Disc.</th><th>Sale Rate</th><th>Sale Disc.</th><th>Tax %</th><th>Total</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="pi-products-tbody"></tbody>
+            </table>
+          </div>
+          <div class="pi-empty-state" id="pi-empty-state" hidden>
+            <i class="fa-solid fa-box-open"></i>
+            <strong>No products added yet</strong>
+            <span>Add your first product or scan a barcode.</span>
+            <div class="pi-empty-actions">
+              <button class="btn btn-sm btn-primary" type="button" onclick="addPiProductRow(true)"><i class="fa-solid fa-plus"></i> Add Product</button>
+              <button class="btn btn-sm btn-secondary" type="button" onclick="openPiBarcodeScanner()"><i class="fa-solid fa-barcode"></i> Scan Barcode</button>
+            </div>
+          </div>
+          <div class="pi-items-totals" id="pi-items-totals">
+            <div><span>Total Items</span><strong id="pi-items-total-count">0</strong></div>
+            <div><span>Total Quantity</span><strong id="pi-items-total-quantity">0</strong></div>
+            <div><span>Subtotal</span><strong id="pi-items-subtotal">$0.00</strong></div>
+            <div><span>Total Discount</span><strong id="pi-items-discount">$0.00</strong></div>
+            <div><span>Total Tax</span><strong id="pi-items-tax">$0.00</strong></div>
+            <div class="pi-items-grand-total"><span>Grand Total</span><strong id="pi-items-grand-total">$0.00</strong></div>
+          </div>
+          <input id="pi-barcode-input" class="pi-barcode-input" type="text" inputmode="numeric" autocomplete="off" placeholder="Scan barcode with USB/Bluetooth scanner…" onkeydown="handlePiBarcodeKey(event)" aria-label="Barcode scanner input" />
+          <div id="pi-camera-scanner" class="pi-camera-scanner" role="dialog" aria-modal="true" aria-label="Barcode scanner"><div class="pi-camera-title"><i class="fa-solid fa-camera"></i> Scan Barcode</div><video id="pi-camera-video" autoplay muted playsinline></video><p>Point your camera at a product barcode.</p><div class="pi-camera-actions"><button class="btn btn-sm btn-secondary" type="button" onclick="closePiBarcodeScanner()">Cancel</button></div></div>
+        </div>
+        <div class="inv-summary-row">
+          <div class="inv-section" style="flex:1">
+            <h3 class="inv-section-title"><i class="fa-solid fa-money-bill-wave"></i> Payment</h3>
+            <div class="form-group">
+              <label>Paid Amount ($)</label>
+              <input type="number" id="pi-paid-amount" class="pi-input" value="0" step="0.01" min="0" oninput="calcPiTotals()" />
+            </div>
+            <div class="form-group">
+              <label>Credit Amount ($)</label>
+              <div class="pi-input-static" id="pi-credit-amount">$0.00</div>
+            </div>
+            <div class="form-group" style="margin-top:8px">
+              <label>Notes (optional)</label>
+              <textarea id="pi-notes" class="pi-input" rows="2" placeholder="Invoice notes…" style="resize:vertical"></textarea>
+            </div>
+          </div>
+          <div class="inv-summary-card">
+            <h4>Invoice Summary</h4>
+            <div class="summary-line"><span>Total Amount</span><strong id="pi-summary-total">$0.00</strong></div>
+            <div class="summary-line"><span>Paid Amount</span><strong id="pi-summary-paid">$0.00</strong></div>
+            <div class="summary-line summary-divider"></div>
+            <div class="summary-line summary-credit"><span>Remaining Credit</span><strong id="pi-summary-credit">$0.00</strong></div>
+            <button class="btn btn-primary" id="pi-confirm-btn" onclick="confirmPiInvoice()" style="width:100%;margin-top:16px">
+              <i class="fa-solid fa-check"></i> Confirm Invoice
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pi-add-supplier-overlay" class="modal-overlay-nested" style="display:none" onclick="if(event.target===this)closeAddSupplierNested()">
+    <div class="modal-box-nested">
+      <div class="modal-header-nested">
+        <h3><i class="fa-solid fa-truck"></i> Add New Supplier</h3>
+        <button class="modal-close-btn" onclick="closeAddSupplierNested()">&times;</button>
+      </div>
+      <div class="modal-body-nested">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Supplier Name</label>
+            <input type="text" id="pi-new-sup-name" placeholder="e.g. ABC Supplies" />
+          </div>
+          <div class="form-group">
+            <label>Company Name</label>
+            <input type="text" id="pi-new-sup-company" placeholder="Company (optional)" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="pi-new-sup-phone" placeholder="+1 555-000-0000" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="pi-new-sup-email" placeholder="email@supplier.com" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Company Address</label>
+          <textarea id="pi-new-sup-address" rows="2" placeholder="Street, city, state…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Notes / Sticky Notes</label>
+          <textarea id="pi-new-sup-notes" rows="2" placeholder="Any notes…"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeAddSupplierNested()">Cancel</button>
+          <button class="btn btn-primary" onclick="event.stopPropagation();saveNewPiSupplier()"><i class="fa-solid fa-floppy-disk"></i> Save Supplier</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pi-confirm-overlay" class="modal-overlay-nested" style="display:none" onclick="if(event.target===this)closePiConfirm()">
+    <div class="modal-box-nested" style="max-width:440px">
+      <div class="modal-header-nested">
+        <h3><i class="fa-solid fa-circle-check"></i> Confirm Invoice</h3>
+      </div>
+      <div class="modal-body-nested">
+        <div class="confirm-details">
+          <div class="confirm-row"><span>Supplier</span><strong id="pi-confirm-supplier">—</strong></div>
+          <div class="confirm-row"><span>Total Amount</span><strong id="pi-confirm-total">$0.00</strong></div>
+          <div class="confirm-row"><span>Paid Amount</span><strong id="pi-confirm-paid">$0.00</strong></div>
+          <div class="confirm-row"><span>Credit Amount</span><strong id="pi-confirm-credit">$0.00</strong></div>
+          <div class="confirm-row"><span>Products Count</span><strong id="pi-confirm-count">0</strong></div>
+        </div>
+        <div class="modal-footer" style="margin-top:20px">
+          <button class="btn btn-secondary" onclick="closePiConfirm()">Cancel</button>
+          <button class="btn btn-primary" id="pi-confirm-save-btn" onclick="savePiInvoice()">
+            <i class="fa-solid fa-check"></i> Confirm & Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pi-print-overlay" class="modal-overlay-nested" style="display:none" onclick="if(event.target===this)closePiPrint()">
+    <div class="modal-box-nested" style="max-width:400px;text-align:center">
+      <div class="modal-header-nested">
+        <h3><i class="fa-solid fa-check-circle" style="color:var(--success)"></i> Invoice Saved!</h3>
+      </div>
+      <div class="modal-body-nested">
+        <p style="font-size:15px;margin-bottom:20px;color:var(--txt-secondary)">
+          Invoice <strong id="pi-print-invno">#000</strong> has been created successfully.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="printPiInvoice()"><i class="fa-solid fa-print"></i> Print Invoice</button>
+          <button class="btn btn-secondary" onclick="downloadPiPDF()"><i class="fa-solid fa-download"></i> Download PDF</button>
+          <button class="btn btn-secondary" onclick="closePiPrint()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

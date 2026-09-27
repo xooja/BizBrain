@@ -1,0 +1,37 @@
+<!-- pages/projects.html -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Projects</h1>
+    <p class="page-subtitle">Track your active and completed work</p>
+  </div>
+  <button class="btn btn-primary" onclick="openProjectModal()">
+    <i class="fa-solid fa-folder-plus"></i> New Project
+  </button>
+</div>
+
+<div class="table-wrap">
+  <div class="table-header">
+    <h3 class="table-title">All Projects</h3>
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="project-search" placeholder="Search projects…" />
+    </div>
+  </div>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Client</th>
+          <th>Status</th>
+          <th>Budget</th>
+          <th>Deadline</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="projects-tbody">
+        <tr><td colspan="6"><div class="page-loader"><div class="spinner"></div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

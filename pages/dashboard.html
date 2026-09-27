@@ -1,0 +1,139 @@
+<!-- pages/dashboard.html -->
+<div class="studio-page-head">
+  <div>
+    <div class="studio-eyebrow">Overview</div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Welcome back. Here is what is happening with your business today.</p>
+  </div>
+  <button class="btn btn-primary btn-sm" type="button" onclick="Router.navigate('reports')">
+    <i class="fa-solid fa-chart-line"></i><span>View reports</span>
+  </button>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card blue">
+    <div class="stat-icon blue"><i class="fa-solid fa-dollar-sign"></i></div>
+    <div class="stat-value" id="stat-revenue">$0</div>
+    <div class="stat-label">Total Revenue</div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-icon purple"><i class="fa-solid fa-users"></i></div>
+    <div class="stat-value" id="stat-clients">0</div>
+    <div class="stat-label">Total Customers</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon green"><i class="fa-solid fa-diagram-project"></i></div>
+    <div class="stat-value" id="stat-projects">0</div>
+    <div class="stat-label">Active Products</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon orange"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+    <div class="stat-value" id="stat-pending">0</div>
+    <div class="stat-label">Pending Sales</div>
+  </div>
+</div>
+
+<div class="dash-grid">
+  <!-- Revenue Chart -->
+  <div class="section-card">
+    <div class="section-header">
+      <h3 class="section-title">Revenue vs Expenses</h3>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Revenue</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div>Expenses</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="chart-container">
+        <div class="google-chart" id="revenue-chart" aria-label="Revenue and expenses chart"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div style="display:flex;flex-direction:column;gap:24px">
+
+    <div class="section-card">
+      <div class="section-header">
+        <h3 class="section-title">Sales mix</h3>
+        <span class="chart-period">This month</span>
+      </div>
+      <div class="section-body chart-body-compact">
+        <div class="google-chart sales-mix-chart" id="sales-mix-chart" aria-label="Sales mix chart"></div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-card">
+      <div class="section-header">
+        <h3 class="section-title">Quick Actions</h3>
+      </div>
+      <div class="section-body">
+        <div class="quick-actions">
+          <a class="quick-action-btn" onclick="Router.navigate('products');setTimeout(()=>openProductModal(),200)">
+            <div class="stat-icon blue" style="margin:0"><i class="fa-solid fa-box"></i></div>
+            <span>Add Product</span>
+          </a>
+          <a class="quick-action-btn" onclick="Router.navigate('customers')">
+            <div class="stat-icon purple" style="margin:0"><i class="fa-solid fa-user-plus"></i></div>
+            <span>Add Customer</span>
+          </a>
+          <a class="quick-action-btn" onclick="Router.navigate('sales_invoices')">
+            <div class="stat-icon green" style="margin:0"><i class="fa-solid fa-file-circle-plus"></i></div>
+            <span>New Sale</span>
+          </a>
+          <a class="quick-action-btn" onclick="Router.navigate('expenses');setTimeout(()=>openExpenseModal(),200)">
+            <div class="stat-icon orange" style="margin:0"><i class="fa-solid fa-receipt"></i></div>
+            <span>Add Expense</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Invoices / Sales -->
+    <div class="section-card">
+      <div class="section-header">
+        <h3 class="section-title">Recent Activity</h3>
+      </div>
+      <div class="section-body" style="padding-top:0">
+        <div class="activity-feed" id="activity-list">
+          <div class="page-loader"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Recent Items -->
+<div class="dash-grid" style="margin-top:24px">
+  <div class="table-wrap">
+    <div class="table-header">
+      <h3 class="table-title">Recent Items</h3>
+      <a onclick="Router.navigate('products')" style="font-size:12px;color:var(--accent);cursor:pointer">View all</a>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr>
+          <th>Item</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr></thead>
+        <tbody id="recent-clients-body">
+          <tr><td colspan="3"><div class="page-loader"><div class="spinner"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-header">
+      <h3 class="section-title">Upcoming</h3>
+    </div>
+    <div class="section-body" style="padding-top:0">
+      <div class="upcoming-list" id="upcoming-invoices">
+        <div class="page-loader"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,9 +2,16 @@
 
   <!-- ─── RESPONSIVE STYLE OVERRIDES ─────────────────────────── -->
   <style>
-    @media (max-width: 768px) {
+    @media (max-width: 1600px) {
       .page-container .dash-grid { grid-template-columns: 1fr !important; }
-      .page-container .dash-grid .section-card { grid-column: 1 !important; }
+      .page-container .dash-grid .section-card { grid-column: 1 / -1 !important; width: 100% !important; }
+      .page-container .dash-grid > .section-card:nth-child(2) {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
+    }
+    @media (max-width: 768px) {
       .page-container .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; }
       .page-container .page-header { flex-direction: column; align-items: stretch; }
       .page-container .page-header .header-actions { flex-direction: column; align-items: stretch; }
@@ -146,7 +153,7 @@
   <div class="dash-grid">
 
     <!-- ─── CUSTOMER TABLE (LEFT / MAIN) ───────────────────── -->
-    <div class="section-card" id="customer-table-section" style="grid-column:1">
+    <div class="section-card main-table-card" id="customer-table-section">
       <div class="section-header">
         <div class="section-title"><i class="fa-solid fa-people-group" style="margin-right:8px;color:var(--accent)"></i>All Customers</div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -177,7 +184,7 @@
     </div>
 
     <!-- ─── RIGHT PANEL: RECENT + OUTSTANDING ──────────────── -->
-    <div class="section-card" style="grid-column:2">
+    <div class="section-card side-overview-card">
       <!-- Recent Customers -->
       <div class="section-header">
         <div class="section-title"><i class="fa-solid fa-clock-rotate-left" style="margin-right:8px;color:var(--accent)"></i>Recent Customers</div>

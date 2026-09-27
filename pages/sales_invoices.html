@@ -2,9 +2,16 @@
 <div class="page-container">
 
   <style>
-    @media (max-width: 768px) {
+    @media (max-width: 1600px) {
       .page-container .dash-grid { grid-template-columns: 1fr !important; }
-      .page-container .dash-grid .section-card { grid-column: 1 !important; }
+      .page-container .dash-grid .section-card { grid-column: 1 / -1 !important; width: 100% !important; }
+      .page-container .dash-grid > .section-card:nth-child(2) .section-body {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+      }
+    }
+    @media (max-width: 768px) {
       .page-container .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; }
       .page-container .page-header { flex-direction: column; align-items: stretch; }
       .page-container .page-header .header-actions { flex-direction: column; align-items: stretch; }
@@ -185,7 +192,7 @@
   <div class="dash-grid">
 
     <!-- ─── SALES INVOICE TABLE (LEFT) ──────────────────────── -->
-    <div class="section-card" id="si-table-section" style="grid-column:1">
+    <div class="section-card main-table-card" id="si-table-section">
       <div class="section-header">
         <div class="section-title"><i class="fa-solid fa-file-invoice" style="margin-right:8px;color:var(--accent)"></i>Sales Invoices</div>
         <span style="font-size:12px;color:var(--txt-muted)" id="si-count-label">0 invoices</span>
@@ -212,7 +219,7 @@
     </div>
 
     <!-- ─── INSIGHTS (RIGHT SIDEBAR) ─────────────────────────── -->
-    <div class="section-card" style="grid-column:2">
+    <div class="section-card side-overview-card">
       <div class="section-header">
         <div class="section-title"><i class="fa-solid fa-chart-simple" style="margin-right:8px;color:var(--accent-2)"></i>Overview</div>
       </div>

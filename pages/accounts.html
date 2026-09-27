@@ -1,9 +1,11 @@
 <div class="page-container">
 
   <style>
-    @media (max-width: 768px) {
+    @media (max-width: 1600px) {
       .page-container .dash-grid { grid-template-columns: 1fr !important; }
-      .page-container .dash-grid .section-card { grid-column: 1 !important; }
+      .page-container .dash-grid .section-card { grid-column: 1 / -1 !important; width: 100% !important; }
+    }
+    @media (max-width: 768px) {
       .page-container .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; }
       .page-container .page-header { flex-direction: column; align-items: stretch; }
       .page-container .page-header .header-actions { flex-direction: column; align-items: stretch; }
@@ -119,7 +121,7 @@
   <div class="dash-grid">
 
     <!-- ─── SUPPLIER BALANCES TABLE (LEFT) ──────────────────── -->
-    <div class="section-card" style="grid-column:1">
+    <div class="section-card main-table-card">
       <div class="section-header">
         <div class="section-title"><i class="fa-solid fa-truck" style="margin-right:8px;color:var(--accent)"></i>Supplier Balances</div>
         <span style="font-size:12px;color:var(--txt-muted)" id="acc-supplier-count">0 suppliers</span>
@@ -140,7 +142,7 @@
     </div>
 
     <!-- ─── CUSTOMER BALANCES TABLE (RIGHT) ─────────────────── -->
-    <div class="section-card" style="grid-column:2">
+    <div class="section-card side-overview-card">
       <div class="section-header">
         <div class="section-title"><i class="fa-solid fa-users" style="margin-right:8px;color:var(--accent-2)"></i>Customer Balances</div>
         <span style="font-size:12px;color:var(--txt-muted)" id="acc-customer-count">0 customers</span>

@@ -3,9 +3,9 @@
  * Service Worker: offline caching, background sync, push notifications.
  */
 
-const CACHE_NAME     = 'bizbrain-v8';
-const DYNAMIC_CACHE  = 'bizbrain-dynamic-v8';
-const API_CACHE      = 'bizbrain-api-v8';
+const CACHE_NAME     = 'bizbrain-v9';
+const DYNAMIC_CACHE  = 'bizbrain-dynamic-v9';
+const API_CACHE      = 'bizbrain-api-v9';
 
 // ── Static assets to pre-cache on install ─────────────────────
 const BASE_PATH = self.location.pathname.replace('/sw.js', '') || '';
@@ -135,8 +135,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // ── App shell & pages — Cache first, network fallback ────
-  event.respondWith(cacheFirst(request, CACHE_NAME));
+  // ── App shell & pages — Network first, cache fallback ────
+  event.respondWith(networkFirst(request, CACHE_NAME));
 });
 
 // ── Background Sync ───────────────────────────────────────────
@@ -197,6 +197,23 @@ async function cacheFirst(request, cacheName) {
     return response;
   } catch (_) {
     // Return offline fallback page if available
+    const fallback = await caches.match(BASE_PATH + '/index.html');
+    return fallback || new Response('Offline', { status: 503 });
+  }
+}
+
+async function networkFirst(request, cacheName) {
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse && networkResponse.status === 200 && networkResponse.type !== 'opaque') {
+      const cache = await caches.open(cacheName);
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (_) {
+    const cache = await caches.open(cacheName);
+    const cached = await cache.match(request);
+    if (cached) return cached;
     const fallback = await caches.match(BASE_PATH + '/index.html');
     return fallback || new Response('Offline', { status: 503 });
   }

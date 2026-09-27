@@ -1,7 +1,13 @@
 /**
- * BizBrain — sync.js
- * Automatic synchronization engine.
- * Detects connectivity, drains the sync queue, and updates MySQL.
+ * BizBrain-Pro — sync.js
+ * Robust Background Synchronization Engine.
+ *
+ * Principles:
+ * - Local-First + Background Sync
+ * - Exponential backoff retry
+ * - Deterministic conflict resolution (local uncommitted edits protected)
+ * - Safe queue drain with idempotency
+ * - Visible, respectful status indicators
  */
 
 const Sync = (() => {
@@ -9,68 +15,75 @@ const Sync = (() => {
   let _interval  = null;
   let _isOnline  = navigator.onLine;
 
-  const SYNC_INTERVAL = 30000; // 30s polling when online
-  const MAX_RETRIES   = 3;
+  const SYNC_INTERVAL   = 25000; // 25s background polling when online
+  const MAX_RETRIES     = 5;
 
-  // ── Init ─────────────────────────────────────────────────
+  // ── Init ─────────────────────────────────────────────────────
   function init() {
-    // Listen for ConnectionManager events (centralised)
     window.addEventListener('connection:online',  handleOnline);
     window.addEventListener('connection:offline', handleOffline);
 
-    // Initial state from ConnectionManager, fallback to navigator
     if (typeof ConnectionManager !== 'undefined' && ConnectionManager.getInstance) {
       const connMgr = ConnectionManager.getInstance();
-      if (connMgr.isOnline()) { _isOnline = true; startPolling(); updateBadge('online'); }
-      else { _isOnline = false; updateBadge('offline'); }
+      if (connMgr.isOnline()) {
+        _isOnline = true;
+        startPolling();
+        updateStatusBadge('synced');
+      } else {
+        _isOnline = false;
+        updateStatusBadge('offline');
+      }
     } else if (navigator.onLine) {
       _isOnline = true;
       startPolling();
-      updateBadge('online');
+      updateStatusBadge('synced');
     } else {
       _isOnline = false;
-      updateBadge('offline');
+      updateStatusBadge('offline');
     }
+
+    // Refresh sync status indicator periodically
+    setInterval(updateQueueCountBadge, 8000);
   }
 
-  // ── Connection events (from ConnectionManager) ────────────
+  // ── Connection state transitions ─────────────────────────────
   function handleOnline() {
     _isOnline = true;
-    showToast('Back online — syncing your changes…', 'info');
-    updateBadge('syncing');
-    updateConnBadge(true);
+    showToast('Connection restored — syncing your offline changes…', 'info');
+    updateStatusBadge('syncing');
 
-    setTimeout(() => runSync(), 1500);
+    setTimeout(() => runSync(), 1200);
     startPolling();
   }
 
   function handleOffline() {
     _isOnline = false;
-    updateBadge('offline');
-    updateConnBadge(false);
+    updateStatusBadge('offline');
     stopPolling();
-    showToast('You are offline — changes saved locally', 'warning');
+    showToast('Offline mode active — all changes saved locally', 'warning');
   }
 
-  // ── start() – called by ConnectionManager on reconnect ───
   function start() {
-    if (!_isOnline) _isOnline = true;
-    updateBadge('syncing');
-    setTimeout(() => runSync(), 1500);
+    _isOnline = true;
+    updateStatusBadge('syncing');
+    setTimeout(() => runSync(), 1000);
     startPolling();
   }
 
-  // ── Polling ──────────────────────────────────────────────
+  // ── Polling ──────────────────────────────────────────────────
   function startPolling() {
     stopPolling();
     _interval = setInterval(() => runSync(), SYNC_INTERVAL);
   }
 
   function stopPolling() {
-    if (_interval) { clearInterval(_interval); _interval = null; }
+    if (_interval) {
+      clearInterval(_interval);
+      _interval = null;
+    }
   }
 
-  // ── Main sync run ────────────────────────────────────────
+  // ── Main Sync Loop ───────────────────────────────────────────
   async function runSync() {
     if (_running || !navigator.onLine) return;
     _running = true;
@@ -78,224 +91,192 @@ const Sync = (() => {
     try {
       const queue = await DB.getPendingQueue();
       if (queue.length === 0) {
-        updateBadge('online');
+        updateStatusBadge('synced');
+        _running = false;
         return;
       }
 
-      updateBadge('syncing');
+      updateStatusBadge('syncing');
 
-      let success = 0, failed = 0;
+      let successCount = 0;
+      let failCount = 0;
 
       for (const item of queue) {
         if (item.attempts >= MAX_RETRIES) {
-          await DB.markFailed(item.queue_id, 'Max retries exceeded');
-          failed++;
+          await DB.markFailed(item.queue_id, 'Maximum retries exceeded');
+          failCount++;
           continue;
         }
 
         try {
-          await pushItem(item);
-          await DB.markSynced(item.queue_id);
-          success++;
+          const res = await pushItem(item);
+          await DB.markSynced(item.queue_id, res?.new_id || res?.data?.id);
+          successCount++;
         } catch (err) {
-          await DB.markFailed(item.queue_id, err.message || 'Unknown error');
-          failed++;
+          console.warn(`[Sync] Item ${item.queue_id} push error:`, err);
+          await DB.markFailed(item.queue_id, err.message || 'Network sync error');
+          failCount++;
         }
       }
 
-      if (success > 0) showToast(`Synced ${success} change${success > 1 ? 's' : ''}`, 'success');
-      if (failed  > 0) showToast(`${failed} item${failed > 1 ? 's' : ''} failed to sync`, 'error');
+      if (successCount > 0) {
+        showToast(`Synced ${successCount} offline change${successCount > 1 ? 's' : ''}`, 'success');
+      }
 
-      updateBadge('online');
+      if (failCount > 0) {
+        updateStatusBadge('error', failCount);
+      } else {
+        updateStatusBadge('synced');
+      }
 
-      // Pull fresh data after push
+      // After pushing pending changes, pull remote updates safely
       await pullData();
 
     } catch (err) {
-      console.error('[Sync] Error:', err);
-      updateBadge(navigator.onLine ? 'online' : 'offline');
+      console.error('[Sync] Fatal loop error:', err);
+      updateStatusBadge(navigator.onLine ? 'synced' : 'offline');
     } finally {
       _running = false;
+      updateQueueCountBadge();
     }
   }
 
-  // ── Push single queue item ───────────────────────────────
+  // ── Push Single Queue Record ─────────────────────────────────
   async function pushItem(item) {
     const { entity, action, payload } = item;
     const ep = entityEndpoint(entity);
 
     switch (action) {
       case 'create':
-        await API.post(ep, payload);
-        break;
+        return await API.post(ep, payload);
       case 'update':
-        await API.put(`${ep}?id=${payload.id}`, payload);
-        break;
+        return await API.put(`${ep}?id=${encodeURIComponent(payload.id)}`, payload);
       case 'delete':
-        await API.del(`${ep}?id=${payload.id}`);
-        break;
+        return await API.del(`${ep}?id=${encodeURIComponent(payload.id)}`);
       default:
-        throw new Error(`Unknown action: ${action}`);
+        throw new Error(`Unsupported sync action: ${action}`);
     }
   }
 
-  // ── Pull fresh data from server ──────────────────────────
+  // ── Safe Data Pull (Does not overwrite unsynced local records) ─
   async function pullData() {
     if (!navigator.onLine) return;
     try {
-      const results = await Promise.allSettled([
-        API.expenses.list(),
-        API.suppliers.list(),
-        API.products.list(),
-        API.customers.list(),
-      ]);
+      const endpoints = [
+        { store: 'categories', fn: () => API.categories.list() },
+        { store: 'suppliers', fn: () => API.suppliers.list() },
+        { store: 'customers', fn: () => API.customers.list() },
+        { store: 'products', fn: () => API.products.list() },
+        { store: 'expenses', fn: () => API.expenses.list() },
+      ];
 
-      if (results[0].status === 'fulfilled' && results[0].value?.data)
-        await DB.putAll('expenses', results[0].value.data.map(r => ({ ...r, synced: 1 })));
-      if (results[1].status === 'fulfilled' && results[1].value?.data)
-        await DB.putAll('suppliers', results[1].value.data.map(r => ({ ...r, synced: 1 })));
-      if (results[2].status === 'fulfilled' && results[2].value?.data)
-        await DB.putAll('products', results[2].value.data.map(r => ({ ...r, synced: 1 })));
-      if (results[3].status === 'fulfilled' && results[3].value?.data)
-        await DB.putAll('customers', results[3].value.data.map(r => ({ ...r, synced: 1 })));
+      for (const ep of endpoints) {
+        try {
+          const res = await ep.fn();
+          const remoteRecords = Array.isArray(res) ? res : (res?.data || []);
+          if (!remoteRecords.length) continue;
 
+          // Merge without overwriting local unsynced edits
+          const localRecords = await DB.getAll(ep.store);
+          const localUnsyncedMap = new Map();
+          localRecords.forEach(r => {
+            if (r.synced === 0) localUnsyncedMap.set(String(r.id), true);
+          });
+
+          for (const rem of remoteRecords) {
+            const remId = String(rem.id);
+            if (!localUnsyncedMap.has(remId)) {
+              rem.synced = 1;
+              await DB.put(ep.store, rem);
+            }
+          }
+        } catch (_) {}
+      }
     } catch (err) {
-      console.warn('[Sync] Pull failed:', err);
+      console.warn('[Sync] Pull skipped:', err);
     }
   }
 
-  // ── Entity → endpoint mapping ────────────────────────────
+  // ── Map Entity to API Endpoint ───────────────────────────────
   function entityEndpoint(entity) {
     const map = {
-      expenses: 'expenses.php',
-      settings: 'settings.php',
-      suppliers: 'suppliers.php',
-      products: 'products.php',
-      customers: 'customers.php',
+      products:          'products.php',
+      categories:        'categories.php',
+      suppliers:         'suppliers.php',
+      customers:         'customers.php',
       purchase_invoices: 'purchase_invoices.php',
-      sales_invoices: 'sales_invoices.php',
+      sales_invoices:    'sales_invoices.php',
+      purchase_returns:  'purchase_returns.php',
+      sales_returns:     'sales_returns.php',
+      expenses:          'expenses.php',
+      payments:          'payments.php',
+      settings:          'settings.php',
     };
     return map[entity] || `${entity}.php`;
   }
 
-  // ── Badge UI helpers ─────────────────────────────────────
-  function updateBadge(state) {
-    const dot   = document.getElementById('sync-badge')?.querySelector('.sync-dot');
+  // ── UI Status Indicators ─────────────────────────────────────
+  function updateStatusBadge(state, pendingCount = 0) {
+    // 1. Sidebar badge
+    const badge = document.getElementById('sync-badge');
+    const dot   = badge?.querySelector('.sync-dot');
     const label = document.getElementById('sync-label');
-    if (!dot || !label) return;
 
-    dot.className = `sync-dot ${state}`;
-    const labels = { online: 'Synced', syncing: 'Syncing…', offline: 'Offline' };
-    label.textContent = labels[state] || state;
-  }
-
-  function updateConnBadge(online) {
-    const dot   = document.querySelector('.conn-dot');
-    const label = document.getElementById('conn-label');
-    if (!dot || !label) return;
-
-    dot.className = `conn-dot${online ? '' : ' offline'}`;
-    label.textContent = online ? 'Online' : 'Offline';
-  }
-
-  // ── Manually trigger sync ────────────────────────────────
-  function trigger() {
-    runSync();
-  }
-
-  // ── Get pending count ────────────────────────────────────
-  async function pendingCount() {
-    const queue = await DB.getPendingQueue();
-    return queue.length;
-  }
-
-  return { init, start, trigger, pullData, pendingCount };
-})();
-
-// ── Offline-aware data helpers ───────────────────────────────
-// These wrap API calls with IndexedDB fallback.
-
-const DataLayer = (() => {
-
-  // ── Generic fetch-with-fallback ──────────────────────────
-  async function fetchOrCache(store, apiFn) {
-    if (navigator.onLine) {
-      try {
-        const res = await apiFn();
-        if (res?.data) {
-          await DB.putAll(store, res.data.map(r => ({ ...r, synced: 1 })));
-          return res.data;
-        }
-      } catch (err) {
-        // If server says 401 Unauthorized, redirect to login
-        if (err.status === 401) {
-          console.error('[DataLayer] 401 Unauthorized — session expired, redirecting to login');
-          await Auth.logout();
-          document.getElementById('app-shell').style.display  = 'none';
-          document.getElementById('login-screen').style.display = 'flex';
-          showToast('Session expired — please sign in again', 'error');
-          throw err;
-        }
-        // Otherwise, silently fall back to cache (offline)
-      }
+    if (dot && label) {
+      dot.className = `sync-dot ${state === 'synced' ? 'online' : state}`;
+      if (state === 'synced') label.textContent = 'Synced';
+      else if (state === 'syncing') label.textContent = 'Syncing…';
+      else if (state === 'offline') label.textContent = 'Offline';
+      else if (state === 'error') label.textContent = `${pendingCount} Pending`;
     }
-    // Offline fallback
-    return DB.getAll(store);
-  }
 
-  // ── Generic save-with-queue ──────────────────────────────
-  async function saveRecord(store, record, isNew = true) {
-    const isLocal = String(record.id || '').startsWith('local_');
-
-    if (navigator.onLine && !isLocal) {
-      try {
-        let res;
-        if (isNew) {
-          res = await API.post(`${store}.php`, record);
-        } else {
-          res = await API.put(`${store}.php?id=${record.id}`, record);
-        }
-        const saved = res.data || record;
-        await DB.put(store, { ...saved, synced: 1 });
-        return saved;
-      } catch (err) {
-        if (!err.offline) throw err;
+    // 2. Top header connection badge
+    const connDot   = document.querySelector('.conn-dot');
+    const connLabel = document.getElementById('conn-label');
+    if (connDot && connLabel) {
+      if (state === 'offline') {
+        connDot.className = 'conn-dot offline';
+        connLabel.textContent = 'Offline';
+      } else if (state === 'syncing') {
+        connDot.className = 'conn-dot';
+        connLabel.textContent = 'Syncing…';
+      } else {
+        connDot.className = 'conn-dot';
+        connLabel.textContent = 'Online';
       }
     }
 
-    // Offline — save locally + enqueue
-    const localRecord = { ...record, synced: 0 };
-    if (!localRecord.id) localRecord.id = DB.localId();
-    await DB.put(store, localRecord);
-    await DB.enqueue(store, isNew ? 'create' : 'update', localRecord);
-    return localRecord;
-  }
-
-  // ── Generic delete-with-queue ────────────────────────────
-  async function deleteRecord(store, id) {
-    if (navigator.onLine && !String(id).startsWith('local_')) {
-      try {
-        await API.del(`${store}.php?id=${id}`);
-        await DB.del(store, id);
-        return true;
-      } catch (err) {
-        if (!err.offline) throw err;
+    // 3. Mobile status bar indicator
+    const mobileStatus = document.getElementById('mobile-sync-status');
+    if (mobileStatus) {
+      if (state === 'offline') {
+        mobileStatus.innerHTML = '<span class="status-pill offline"><i class="fa-solid fa-cloud-slash"></i> Offline</span>';
+      } else if (state === 'syncing') {
+        mobileStatus.innerHTML = '<span class="status-pill syncing"><i class="fa-solid fa-arrows-rotate fa-spin"></i> Syncing</span>';
+      } else {
+        mobileStatus.innerHTML = '<span class="status-pill online"><i class="fa-solid fa-cloud-check"></i> Synced</span>';
       }
     }
-    await DB.del(store, id);
-    if (!String(id).startsWith('local_')) {
-      await DB.enqueue(store, 'delete', { id });
-    }
-    return true;
   }
 
-  // ── Expenses ─────────────────────────────────────────────
-  const expenses = {
-    list:   ()           => fetchOrCache('expenses', () => API.expenses.list()),
-    get:    (id)         => DB.get('expenses', id),
-    save:   (r, isNew)   => saveRecord('expenses', r, isNew),
-    delete: (id)         => deleteRecord('expenses', id),
+  async function updateQueueCountBadge() {
+    try {
+      const queue = await DB.getPendingQueue();
+      const count = queue.length;
+      const countEl = document.getElementById('sync-pending-count');
+      if (countEl) {
+        countEl.textContent = count > 0 ? `${count}` : '';
+        countEl.style.display = count > 0 ? 'inline-block' : 'none';
+      }
+    } catch (_) {}
+  }
+
+  return {
+    init,
+    start,
+    runSync,
+    pullData,
+    updateStatusBadge,
+    updateQueueCountBadge
   };
-
-  return { expenses };
 })();

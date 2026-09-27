@@ -1,9 +1,11 @@
 <div class="page-container">
 
   <style>
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
       .page-container .dash-grid { grid-template-columns: 1fr !important; }
-      .page-container .dash-grid .section-card { grid-column: 1 !important; }
+      .page-container .dash-grid .section-card { grid-column: 1 !important; width: 100% !important; }
+    }
+    @media (max-width: 768px) {
       .page-container .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; }
       .page-container .page-header { flex-direction: column; align-items: stretch; }
       .page-container .page-header .header-actions { flex-direction: column; align-items: stretch; }

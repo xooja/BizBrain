@@ -9,8 +9,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
-const HOST = '0.0.0.0';
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 // ── Normalize URLs (.php stripping and prefix handling) ───────
 app.use((req, res, next) => {
@@ -247,17 +247,17 @@ apiRouter.post('/auth/verify-pin', (req, res) => {
 });
 
 // Check username
-apiRouter.get('/auth/check-username', (req, res) => {
-  const username = req.query.username;
+apiRouter.all('/auth/check-username', (req, res) => {
+  const username = req.query.username || req.body?.username;
   const exists = db.users.some(u => u.username === username);
-  res.json({ success: true, available: !exists });
+  res.json({ success: true, available: !exists, data: { available: !exists } });
 });
 
 // Check email
-apiRouter.get('/auth/check-email', (req, res) => {
-  const email = req.query.email;
+apiRouter.all('/auth/check-email', (req, res) => {
+  const email = req.query.email || req.body?.email;
   const exists = db.users.some(u => u.email === email);
-  res.json({ success: true, available: !exists });
+  res.json({ success: true, available: !exists, data: { available: !exists } });
 });
 
 // Register
@@ -353,8 +353,9 @@ apiRouter.get('/dashboard', (req, res) => {
 });
 
 // Products CRUD
-apiRouter.get('/products', (req, res) => {
-  const { id, q, category_id, low_stock } = req.query;
+apiRouter.get(['/products', '/products/:id'], (req, res) => {
+  const id = req.params.id || req.query.id;
+  const { q, category_id, low_stock } = req.query;
   if (id) {
     const item = db.products.find(p => p.id === parseInt(id));
     if (!item) return res.status(404).json({ success: false, message: 'Not found' });
@@ -424,8 +425,8 @@ apiRouter.post('/products', (req, res) => {
   res.status(201).json({ success: true, data: { id: newProduct.id }, message: 'Product created' });
 });
 
-apiRouter.put('/products', (req, res) => {
-  const id = parseInt(req.query.id || req.body.id);
+apiRouter.put(['/products', '/products/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id || req.body.id);
   const idx = db.products.findIndex(p => p.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Product not found' });
   const body = req.body;
@@ -441,8 +442,8 @@ apiRouter.put('/products', (req, res) => {
   res.json({ success: true, data: db.products[idx], message: 'Product updated' });
 });
 
-apiRouter.delete('/products', (req, res) => {
-  const id = parseInt(req.query.id);
+apiRouter.delete(['/products', '/products/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id);
   const idx = db.products.findIndex(p => p.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Product not found' });
   db.products.splice(idx, 1);
@@ -450,8 +451,8 @@ apiRouter.delete('/products', (req, res) => {
 });
 
 // Categories CRUD
-apiRouter.get('/categories', (req, res) => {
-  const id = req.query.id ? parseInt(req.query.id) : null;
+apiRouter.get(['/categories', '/categories/:id'], (req, res) => {
+  const id = (req.params.id || req.query.id) ? parseInt(req.params.id || req.query.id) : null;
   if (id) {
     const item = db.categories.find(c => c.id === id);
     return item ? res.json({ success: true, data: item }) : res.status(404).json({ success: false, message: 'Not found' });
@@ -467,16 +468,16 @@ apiRouter.post('/categories', (req, res) => {
   res.status(201).json({ success: true, data: { id: newCat.id }, message: 'Category created' });
 });
 
-apiRouter.put('/categories', (req, res) => {
-  const id = parseInt(req.query.id || req.body.id);
+apiRouter.put(['/categories', '/categories/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id || req.body.id);
   const idx = db.categories.findIndex(c => c.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Category not found' });
   db.categories[idx] = { ...db.categories[idx], ...req.body };
   res.json({ success: true, data: db.categories[idx], message: 'Category updated' });
 });
 
-apiRouter.delete('/categories', (req, res) => {
-  const id = parseInt(req.query.id);
+apiRouter.delete(['/categories', '/categories/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id);
   const idx = db.categories.findIndex(c => c.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Category not found' });
   db.categories.splice(idx, 1);
@@ -484,8 +485,8 @@ apiRouter.delete('/categories', (req, res) => {
 });
 
 // Suppliers CRUD
-apiRouter.get('/suppliers', (req, res) => {
-  const id = req.query.id ? parseInt(req.query.id) : null;
+apiRouter.get(['/suppliers', '/suppliers/:id'], (req, res) => {
+  const id = (req.params.id || req.query.id) ? parseInt(req.params.id || req.query.id) : null;
   if (id) {
     const item = db.suppliers.find(s => s.id === id);
     return item ? res.json({ success: true, data: item }) : res.status(404).json({ success: false, message: 'Not found' });
@@ -511,16 +512,16 @@ apiRouter.post('/suppliers', (req, res) => {
   res.status(201).json({ success: true, data: { id: newSupplier.id }, message: 'Supplier created' });
 });
 
-apiRouter.put('/suppliers', (req, res) => {
-  const id = parseInt(req.query.id || req.body.id);
+apiRouter.put(['/suppliers', '/suppliers/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id || req.body.id);
   const idx = db.suppliers.findIndex(s => s.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Supplier not found' });
   db.suppliers[idx] = { ...db.suppliers[idx], ...req.body };
   res.json({ success: true, data: db.suppliers[idx], message: 'Supplier updated' });
 });
 
-apiRouter.delete('/suppliers', (req, res) => {
-  const id = parseInt(req.query.id);
+apiRouter.delete(['/suppliers', '/suppliers/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id);
   const idx = db.suppliers.findIndex(s => s.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Supplier not found' });
   db.suppliers.splice(idx, 1);
@@ -528,8 +529,8 @@ apiRouter.delete('/suppliers', (req, res) => {
 });
 
 // Customers CRUD
-apiRouter.get('/customers', (req, res) => {
-  const id = req.query.id ? parseInt(req.query.id) : null;
+apiRouter.get(['/customers', '/customers/:id'], (req, res) => {
+  const id = (req.params.id || req.query.id) ? parseInt(req.params.id || req.query.id) : null;
   if (id) {
     const item = db.customers.find(c => c.id === id);
     return item ? res.json({ success: true, data: item }) : res.status(404).json({ success: false, message: 'Not found' });
@@ -555,16 +556,16 @@ apiRouter.post('/customers', (req, res) => {
   res.status(201).json({ success: true, data: { id: newCustomer.id }, message: 'Customer created' });
 });
 
-apiRouter.put('/customers', (req, res) => {
-  const id = parseInt(req.query.id || req.body.id);
+apiRouter.put(['/customers', '/customers/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id || req.body.id);
   const idx = db.customers.findIndex(c => c.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Customer not found' });
   db.customers[idx] = { ...db.customers[idx], ...req.body };
   res.json({ success: true, data: db.customers[idx], message: 'Customer updated' });
 });
 
-apiRouter.delete('/customers', (req, res) => {
-  const id = parseInt(req.query.id);
+apiRouter.delete(['/customers', '/customers/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id);
   const idx = db.customers.findIndex(c => c.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Customer not found' });
   db.customers.splice(idx, 1);
@@ -572,7 +573,7 @@ apiRouter.delete('/customers', (req, res) => {
 });
 
 // Purchase Invoices CRUD
-apiRouter.get('/purchase_invoices', (req, res) => {
+apiRouter.get(['/purchase_invoices', '/purchase-invoices', '/purchase_invoices/:id', '/purchase-invoices/:id'], (req, res) => {
   if (req.query.next_invoice_no) {
     const prefix = 'PI-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-';
     const nextSeq = String(db.purchaseInvoices.length + 1).padStart(3, '0');
@@ -583,7 +584,7 @@ apiRouter.get('/purchase_invoices', (req, res) => {
     const exists = db.purchaseInvoices.some(p => p.invoice_no === no);
     return res.json({ success: true, data: { available: !exists } });
   }
-  const id = req.query.id ? parseInt(req.query.id) : null;
+  const id = (req.params.id || req.query.id) ? parseInt(req.params.id || req.query.id) : null;
   if (id) {
     const item = db.purchaseInvoices.find(p => p.id === id);
     if (!item) return res.status(404).json({ success: false, message: 'Not found' });
@@ -608,7 +609,7 @@ apiRouter.get('/purchase_invoices', (req, res) => {
   res.json({ success: true, data: list });
 });
 
-apiRouter.post('/purchase_invoices', (req, res) => {
+apiRouter.post(['/purchase_invoices', '/purchase-invoices'], (req, res) => {
   const body = req.body;
   const newInvoice = {
     id: genId(),
@@ -657,16 +658,16 @@ apiRouter.post('/purchase_invoices', (req, res) => {
   res.status(201).json({ success: true, data: { id: newInvoice.id }, message: 'Purchase invoice created' });
 });
 
-apiRouter.put('/purchase_invoices', (req, res) => {
-  const id = parseInt(req.query.id || req.body.id);
+apiRouter.put(['/purchase_invoices', '/purchase-invoices', '/purchase_invoices/:id', '/purchase-invoices/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id || req.body.id);
   const idx = db.purchaseInvoices.findIndex(p => p.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Invoice not found' });
   db.purchaseInvoices[idx] = { ...db.purchaseInvoices[idx], ...req.body };
   res.json({ success: true, data: db.purchaseInvoices[idx], message: 'Invoice updated' });
 });
 
-apiRouter.delete('/purchase_invoices', (req, res) => {
-  const id = parseInt(req.query.id);
+apiRouter.delete(['/purchase_invoices', '/purchase-invoices', '/purchase_invoices/:id', '/purchase-invoices/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id);
   const idx = db.purchaseInvoices.findIndex(p => p.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Invoice not found' });
   db.purchaseInvoices.splice(idx, 1);
@@ -674,8 +675,8 @@ apiRouter.delete('/purchase_invoices', (req, res) => {
 });
 
 // Sales Invoices CRUD
-apiRouter.get('/sales_invoices', (req, res) => {
-  const id = req.query.id ? parseInt(req.query.id) : null;
+apiRouter.get(['/sales_invoices', '/sales-invoices', '/sales_invoices/:id', '/sales-invoices/:id'], (req, res) => {
+  const id = (req.params.id || req.query.id) ? parseInt(req.params.id || req.query.id) : null;
   if (id) {
     const item = db.salesInvoices.find(s => s.id === id);
     if (!item) return res.status(404).json({ success: false, message: 'Not found' });
@@ -698,7 +699,7 @@ apiRouter.get('/sales_invoices', (req, res) => {
   res.json({ success: true, data: list });
 });
 
-apiRouter.post('/sales_invoices', (req, res) => {
+apiRouter.post(['/sales_invoices', '/sales-invoices'], (req, res) => {
   const body = req.body;
   const newInvoice = {
     id: genId(),
@@ -747,16 +748,16 @@ apiRouter.post('/sales_invoices', (req, res) => {
   res.status(201).json({ success: true, data: { id: newInvoice.id }, message: 'Sales invoice created' });
 });
 
-apiRouter.put('/sales_invoices', (req, res) => {
-  const id = parseInt(req.query.id || req.body.id);
+apiRouter.put(['/sales_invoices', '/sales-invoices', '/sales_invoices/:id', '/sales-invoices/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id || req.body.id);
   const idx = db.salesInvoices.findIndex(s => s.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Invoice not found' });
   db.salesInvoices[idx] = { ...db.salesInvoices[idx], ...req.body };
   res.json({ success: true, data: db.salesInvoices[idx], message: 'Invoice updated' });
 });
 
-apiRouter.delete('/sales_invoices', (req, res) => {
-  const id = parseInt(req.query.id);
+apiRouter.delete(['/sales_invoices', '/sales-invoices', '/sales_invoices/:id', '/sales-invoices/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id);
   const idx = db.salesInvoices.findIndex(s => s.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Invoice not found' });
   db.salesInvoices.splice(idx, 1);
@@ -764,27 +765,65 @@ apiRouter.delete('/sales_invoices', (req, res) => {
 });
 
 // Returns CRUD
-apiRouter.get('/purchase_returns', (req, res) => {
+apiRouter.get(['/purchase_returns', '/purchase-returns'], (req, res) => {
   res.json({ success: true, data: db.purchaseReturns });
 });
-apiRouter.post('/purchase_returns', (req, res) => {
+apiRouter.post(['/purchase_returns', '/purchase-returns'], (req, res) => {
   const item = { id: genId(), user_id: 1, ...req.body, created_at: new Date().toISOString() };
   db.purchaseReturns.push(item);
   res.status(201).json({ success: true, data: { id: item.id }, message: 'Purchase return recorded' });
 });
 
-apiRouter.get('/sales_returns', (req, res) => {
+apiRouter.get(['/sales_returns', '/sales-returns'], (req, res) => {
   res.json({ success: true, data: db.salesReturns });
 });
-apiRouter.post('/sales_returns', (req, res) => {
+apiRouter.post(['/sales_returns', '/sales-returns'], (req, res) => {
   const item = { id: genId(), user_id: 1, ...req.body, created_at: new Date().toISOString() };
   db.salesReturns.push(item);
   res.status(201).json({ success: true, data: { id: item.id }, message: 'Sales return recorded' });
 });
 
+// Products purchased from supplier
+apiRouter.get(['/products-purchased', '/products_purchased'], (req, res) => {
+  const supplierId = req.query.supplier_id ? parseInt(req.query.supplier_id) : null;
+  const relevantInvoices = supplierId 
+    ? db.purchaseInvoices.filter(p => p.supplier_id === supplierId)
+    : db.purchaseInvoices;
+  
+  const productMap = {};
+  relevantInvoices.forEach(inv => {
+    (inv.items || []).forEach(item => {
+      const pid = item.product_id;
+      if (!productMap[pid]) {
+        productMap[pid] = {
+          id: pid,
+          name: item.product_name,
+          total_qty: 0,
+          total_cost: 0,
+          last_purchase_date: inv.date,
+          last_price: item.unit_price || 0
+        };
+      }
+      productMap[pid].total_qty += (parseFloat(item.quantity) || 0);
+      productMap[pid].total_cost += (parseFloat(item.total) || 0);
+      if (inv.date >= productMap[pid].last_purchase_date) {
+        productMap[pid].last_purchase_date = inv.date;
+        productMap[pid].last_price = item.unit_price || 0;
+      }
+    });
+  });
+
+  const list = Object.values(productMap).map(p => ({
+    ...p,
+    avg_cost: p.total_qty > 0 ? (p.total_cost / p.total_qty) : p.last_price
+  }));
+
+  res.json({ success: true, data: list });
+});
+
 // Expenses CRUD
-apiRouter.get('/expenses', (req, res) => {
-  const id = req.query.id ? parseInt(req.query.id) : null;
+apiRouter.get(['/expenses', '/expenses/:id'], (req, res) => {
+  const id = (req.params.id || req.query.id) ? parseInt(req.params.id || req.query.id) : null;
   if (id) {
     const item = db.expenses.find(e => e.id === id);
     return item ? res.json({ success: true, data: item }) : res.status(404).json({ success: false, message: 'Not found' });
@@ -808,16 +847,16 @@ apiRouter.post('/expenses', (req, res) => {
   res.status(201).json({ success: true, data: { id: newExp.id }, message: 'Expense recorded' });
 });
 
-apiRouter.put('/expenses', (req, res) => {
-  const id = parseInt(req.query.id || req.body.id);
+apiRouter.put(['/expenses', '/expenses/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id || req.body.id);
   const idx = db.expenses.findIndex(e => e.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Expense not found' });
   db.expenses[idx] = { ...db.expenses[idx], ...req.body };
   res.json({ success: true, data: db.expenses[idx], message: 'Expense updated' });
 });
 
-apiRouter.delete('/expenses', (req, res) => {
-  const id = parseInt(req.query.id);
+apiRouter.delete(['/expenses', '/expenses/:id'], (req, res) => {
+  const id = parseInt(req.params.id || req.query.id);
   const idx = db.expenses.findIndex(e => e.id === id);
   if (idx === -1) return res.status(404).json({ success: false, message: 'Expense not found' });
   db.expenses.splice(idx, 1);
@@ -968,7 +1007,12 @@ app.use('/BizBrain-Pro/php/api', apiRouter);
 app.use('/api', apiRouter);
 
 // ── Static Files ──────────────────────────────────────────────
+app.use('/BizBrain-Pro', express.static(__dirname));
 app.use(express.static(__dirname));
+
+app.get(['/BizBrain-Pro', '/BizBrain-Pro/'], (req, res) => {
+  res.redirect('/');
+});
 
 // ── SPA Fallback ──────────────────────────────────────────────
 const indexHtmlPath = path.join(__dirname, 'index.html');
@@ -986,6 +1030,15 @@ app.get(/.*/, (req, res) => {
   } catch (err) {
     res.status(500).send('Error loading application shell');
   }
+});
+
+// ── Error Handler ─────────────────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error('[BizBrain Server Error]', err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
 // ── Start Server ──────────────────────────────────────────────

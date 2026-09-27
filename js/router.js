@@ -25,21 +25,21 @@ const Router = (() => {
 
   // ── Route map (page name → file/title) ─────────────────────
   const ROUTES = {
-    dashboard:         { file: 'pages/dashboard.html?v=4',      title: 'Dashboard',       icon: 'fa-gauge-high' },
-    expenses:          { file: 'pages/expenses.html',          title: 'Expenses',        icon: 'fa-receipt' },
-    reports:           { file: 'pages/reports.html?v=5',        title: 'Reports',         icon: 'fa-chart-line' },
-    settings:          { file: 'pages/settings.html',          title: 'Settings',        icon: 'fa-gear' },
-    products:          { file: 'pages/products.html',          title: 'Products',        icon: 'fa-boxes-stacked' },
-    categories:        { file: 'pages/categories.html',        title: 'Categories',      icon: 'fa-tags' },
-    suppliers:         { file: 'pages/suppliers.html',          title: 'Suppliers',       icon: 'fa-truck' },
-    customers:         { file: 'pages/customers.html',          title: 'Customers',       icon: 'fa-people-group' },
-    purchase_invoices:        { file: 'pages/purchase_invoices.html?v=12', title: 'Purchases',       icon: 'fa-cart-shopping' },
-    purchase_invoices_create: { file: 'pages/purchase_invoices.html?v=12', title: 'New Purchase Invoice', icon: 'fa-cart-plus' },
-    sales_invoices:    { file: 'pages/sales_invoices.html',     title: 'Sales Invoices',  icon: 'fa-file-invoice' },
-    purchase_returns:  { file: 'pages/purchase_returns.html',   title: 'Purchase Returns',icon: 'fa-arrow-left' },
-    sales_returns:     { file: 'pages/sales_returns.html',      title: 'Sales Returns',   icon: 'fa-arrow-right' },
-    accounts:          { file: 'pages/accounts.html',           title: 'Accounts',        icon: 'fa-chart-pie' },
-    team:              { file: 'pages/team.html',               title: 'Team',            icon: 'fa-users-gear' },
+    dashboard:         { file: 'pages/dashboard.html?v=20',      title: 'Dashboard',       icon: 'fa-gauge-high' },
+    expenses:          { file: 'pages/expenses.html?v=20',       title: 'Expenses',        icon: 'fa-receipt' },
+    reports:           { file: 'pages/reports.html?v=20',        title: 'Reports',         icon: 'fa-chart-line' },
+    settings:          { file: 'pages/settings.html?v=20',       title: 'Settings',        icon: 'fa-gear' },
+    products:          { file: 'pages/products.html?v=20',       title: 'Products',        icon: 'fa-boxes-stacked' },
+    categories:        { file: 'pages/categories.html?v=20',     title: 'Categories',      icon: 'fa-tags' },
+    suppliers:         { file: 'pages/suppliers.html?v=20',      title: 'Suppliers',       icon: 'fa-truck' },
+    customers:         { file: 'pages/customers.html?v=20',      title: 'Customers',       icon: 'fa-people-group' },
+    purchase_invoices:        { file: 'pages/purchase_invoices.html?v=20', title: 'Purchases',       icon: 'fa-cart-shopping' },
+    purchase_invoices_create: { file: 'pages/purchase_invoices.html?v=20', title: 'New Purchase Invoice', icon: 'fa-cart-plus' },
+    sales_invoices:    { file: 'pages/sales_invoices.html?v=20',  title: 'Sales Invoices',  icon: 'fa-file-invoice' },
+    purchase_returns:  { file: 'pages/purchase_returns.html?v=20',title: 'Purchase Returns',icon: 'fa-arrow-left' },
+    sales_returns:     { file: 'pages/sales_returns.html?v=20',   title: 'Sales Returns',   icon: 'fa-arrow-right' },
+    accounts:          { file: 'pages/accounts.html?v=20',        title: 'Accounts',        icon: 'fa-chart-pie' },
+    team:              { file: 'pages/team.html?v=20',            title: 'Team',            icon: 'fa-users-gear' },
   };
 
   // ── Route registry ─────────────────────────────────────────

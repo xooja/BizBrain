@@ -73,12 +73,27 @@
 
 /* ── Dashboard Grid ──────────────────────────────────────── */
 .dash-grid {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 24px !important;
+  width: 100% !important;
 }
 
-.dash-grid-full { grid-column: 1 / -1; }
+.dash-grid > .section-card,
+.dash-grid > div {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.dash-grid-full { width: 100% !important; }
+
+.side-overview-card .section-body,
+.dash-grid > .section-card:nth-child(2) .section-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
 
 .section-card {
   background: var(--bg-card);

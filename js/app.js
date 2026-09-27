@@ -13,7 +13,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   // ── Step 2: Register service worker ──────────────────────
   if ('serviceWorker' in navigator) {
     try {
-      await navigator.serviceWorker.register('./sw.js');
+      const reg = await navigator.serviceWorker.register('./sw.js');
+      if (reg) reg.update();
     } catch (err) {
       console.warn('[SW] Registration failed:', err);
     }
@@ -337,11 +338,11 @@ function renderExpensesTable(expenses) {
 
   tbody.innerHTML = expenses.map(e => `
     <tr>
-      <td data-label="Title"><div class="cell-name">${esc(e.title || e.description || 'Expense')}</div></td>
-      <td data-label="Category"><span class="badge badge-info">${esc(e.category || 'General')}</span></td>
-      <td style="font-weight:600;color:var(--danger)" data-label="Amount">${Fmt.currency(e.amount)}</td>
-      <td data-label="Date">${Fmt.date(e.date || e.created_at)}</td>
-      <td data-label="Actions">
+      <td data-label="Title" class="col-pri"><div class="cell-name">${esc(e.title || e.description || 'Expense')}</div></td>
+      <td data-label="Category" class="col-pri"><span class="badge badge-info">${esc(e.category || 'General')}</span></td>
+      <td style="font-weight:600;color:var(--danger)" class="col-pri" data-label="Amount">${Fmt.currency(e.amount)}</td>
+      <td data-label="Date" class="col-secondary">${Fmt.date(e.date || e.created_at)}</td>
+      <td data-label="Actions" class="col-actions">
         <div class="table-actions">
           <button class="action-btn edit"   onclick="editExpense('${e.id}')"   title="Edit"><i class="fa-solid fa-pen"></i></button>
           <button class="action-btn delete" onclick="deleteExpense('${e.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
@@ -1642,8 +1643,8 @@ function _renderProductTable() {
     const stockLabel = isOut ? 'Out of Stock' : isLow ? 'Low Stock' : qty;
 
     return `<tr>
-      ${bulkMode ? `<td style="width:30px" data-label="Select"><input type="checkbox" class="prod-select" value="${p.id}" ${_prodSelected.has(String(p.id)) ? 'checked' : ''} onchange="toggleProductSelect('${p.id}')" /></td>` : ''}
-      <td data-label="Product">
+      ${bulkMode ? `<td style="width:30px" class="col-opt" data-label="Select"><input type="checkbox" class="prod-select" value="${p.id}" ${_prodSelected.has(String(p.id)) ? 'checked' : ''} onchange="toggleProductSelect('${p.id}')" /></td>` : ''}
+      <td data-label="Product" class="col-pri">
         <div class="cell-avatar">
           <div class="avatar sm" style="background:${Fmt.avatarColor(p.name)}">${Fmt.initials(p.name)}</div>
           <div>
@@ -1652,17 +1653,16 @@ function _renderProductTable() {
           </div>
         </div>
       </td>
-      <td class="muted" data-label="Category">${esc(p.category_name || '—')}</td>
-      <td class="muted" data-label="Purchase Rate">${Fmt.currency(p.purchase_price)}</td>
-      <td style="font-weight:600;color:var(--success)" data-label="Sale Rate">${Fmt.currency(p.sale_price)}</td>
-      <td data-label="Stock Status"><span class="badge badge-${stockBadge}">${stockLabel}</span></td>
-      <td data-label="Status"><span class="badge badge-${(p.status||'active') === 'active' ? 'success' : 'muted'}">${p.status || 'active'}</span></td>
-      <td data-label="Actions">
+      <td class="muted col-secondary" data-label="Category">${esc(p.category_name || '—')}</td>
+      <td class="muted col-opt" data-label="Purchase Rate">${Fmt.currency(p.purchase_price)}</td>
+      <td style="font-weight:600;color:var(--success)" class="col-pri" data-label="Sale Rate">${Fmt.currency(p.sale_price)}</td>
+      <td data-label="Stock Status" class="col-pri"><span class="badge badge-${stockBadge}">${stockLabel}</span></td>
+      <td data-label="Status" class="col-secondary"><span class="badge badge-${(p.status||'active') === 'active' ? 'success' : 'muted'}">${p.status || 'active'}</span></td>
+      <td data-label="Actions" class="col-actions">
         <div class="table-actions">
-          <button class="action-btn" onclick="viewProductDetail('${p.id}')" title="View"><i class="fa-solid fa-arrow-up"></i></button>
-          <button class="action-btn view" onclick="viewProductDetail('${p.id}')" title="View"><i class="fa-solid fa-eye"></i></button>
-          <button class="action-btn edit" onclick="editProduct('${p.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
-          <button class="action-btn delete" onclick="deleteProduct('${p.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          <button class="action-btn view" onclick="viewProductDetail('${p.id}')" title="View Details"><i class="fa-solid fa-eye"></i></button>
+          <button class="action-btn edit" onclick="editProduct('${p.id}')" title="Edit Product"><i class="fa-solid fa-pen"></i></button>
+          <button class="action-btn delete" onclick="deleteProduct('${p.id}')" title="Delete Product"><i class="fa-solid fa-trash"></i></button>
         </div>
       </td>
     </tr>`;
@@ -2263,8 +2263,8 @@ function _renderCategoryTable() {
     const prodCount = parseInt(c.product_count || 0);
     return `
     <tr>
-      ${bulkMode ? `<td data-label="Select"><input type="checkbox" class="cat-checkbox" value="${catId}" ${_catSelected.has(catId) ? 'checked' : ''} onchange="toggleCatSelect('${catId}')" /></td>` : ''}
-      <td data-label="Category">
+      ${bulkMode ? `<td class="col-opt" data-label="Select"><input type="checkbox" class="cat-checkbox" value="${catId}" ${_catSelected.has(catId) ? 'checked' : ''} onchange="toggleCatSelect('${catId}')" /></td>` : ''}
+      <td data-label="Category" class="col-pri">
         <div class="cell-avatar">
           <div class="avatar sm" style="background:${Fmt.avatarColor(c.name) || 'var(--accent)'}">${Fmt.initials(c.name)}</div>
           <div>
@@ -2272,11 +2272,11 @@ function _renderCategoryTable() {
           </div>
         </div>
       </td>
-      <td class="muted" data-label="Description">${esc(c.description || '—')}</td>
-      <td class="muted" data-label="Products" style="font-weight:600">${prodCount}</td>
-      <td data-label="Status"><span class="badge badge-${statusClass}">${c.status || 'active'}</span></td>
-      <td class="muted" data-label="Created">${Fmt.date(c.created_at)}</td>
-      <td data-label="Actions">
+      <td class="muted col-opt" data-label="Description">${esc(c.description || '—')}</td>
+      <td class="muted col-pri" data-label="Products" style="font-weight:600">${prodCount}</td>
+      <td data-label="Status" class="col-secondary"><span class="badge badge-${statusClass}">${c.status || 'active'}</span></td>
+      <td class="muted col-opt" data-label="Created">${Fmt.date(c.created_at)}</td>
+      <td data-label="Actions" class="col-actions">
         <div class="table-actions">
           <button class="action-btn view" onclick="viewCategory('${catId}')" title="View"><i class="fa-solid fa-eye"></i></button>
           <button class="action-btn edit" onclick="editCategory('${catId}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
@@ -2797,7 +2797,7 @@ function _renderSupplierTable() {
 
   tbody.innerHTML = pageItems.map(s => `
     <tr>
-      <td data-label="Supplier">
+      <td data-label="Supplier" class="col-pri">
         <div class="cell-avatar">
           <div class="avatar sm">${Fmt.initials(s.company_name || s.contact_person || 'S')}</div>
           <div>
@@ -2806,14 +2806,13 @@ function _renderSupplierTable() {
           </div>
         </div>
       </td>
-      <td class="muted" data-label="Phone">${esc(s.phone || '—')}</td>
-      <td class="muted" data-label="Contact">${esc(s.contact_person || s.company_name || '—')}</td>
-       <td data-label="Balance" style="font-weight:600;color:${(s.opening_balance_type||'').toLowerCase()==='receivable' ? 'var(--success)' : (parseFloat(s.current_balance||0) > 0 ? 'var(--danger)' : 'var(--success)')}">${Fmt.currency(s.current_balance)}</td>
-      <td data-label="Status"><span class="badge badge-${(s.status||'active') === 'active' ? 'success' : 'muted'}">${s.status || 'active'}</span></td>
-      <td data-label="Actions">
+      <td class="muted col-pri" data-label="Phone">${esc(s.phone || '—')}</td>
+      <td class="muted col-secondary" data-label="Contact">${esc(s.contact_person || s.company_name || '—')}</td>
+      <td data-label="Balance" class="col-pri" style="font-weight:600;color:${(s.opening_balance_type||'').toLowerCase()==='receivable' ? 'var(--success)' : (parseFloat(s.current_balance||0) > 0 ? 'var(--danger)' : 'var(--success)')}">${Fmt.currency(s.current_balance)}</td>
+      <td data-label="Status" class="col-secondary"><span class="badge badge-${(s.status||'active') === 'active' ? 'success' : 'muted'}">${s.status || 'active'}</span></td>
+      <td data-label="Actions" class="col-actions">
         <div class="table-actions">
-          <button class="action-btn" onclick="openModule('supplier','${s.id}')" title="Detail Sheet" style="color:var(--accent)"><i class="fa-solid fa-arrow-up"></i></button>
-          <button class="action-btn view" onclick="viewSupplierDetail('${s.id}')" title="View"><i class="fa-solid fa-eye"></i></button>
+          <button class="action-btn view" onclick="openModule('supplier','${s.id}')" title="Detail Sheet" style="color:var(--accent)"><i class="fa-solid fa-eye"></i></button>
           <button class="action-btn edit" onclick="editSupplier('${s.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
           <button class="action-btn delete" onclick="deleteSupplier('${s.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
         </div>
@@ -3322,16 +3321,15 @@ function _renderCustomerTable() {
           </div>
         </div>
       </td>
-      <td class="muted" data-label="Company">${esc(c.company_name || '—')}</td>
-      <td class="muted" data-label="Phone">${esc(c.phone || '—')}</td>
-      <td class="muted" data-label="City">${esc(_extractCity(c.address) || '—')}</td>
-      <td data-label="Balance"><span class="customer-balance ${balClass}">${Fmt.currency(bal)}</span></td>
-      <td data-label="Status"><span class="badge badge-${statusClass}">${c.status || 'active'}</span></td>
-      <td class="muted" data-label="Last Tx">${c.last_transaction_date ? Fmt.date(c.last_transaction_date) : '—'}</td>
-      <td data-label="Actions">
+      <td class="muted col-secondary" data-label="Company">${esc(c.company_name || '—')}</td>
+      <td class="muted col-pri" data-label="Phone">${esc(c.phone || '—')}</td>
+      <td class="muted col-opt" data-label="City">${esc(_extractCity(c.address) || '—')}</td>
+      <td data-label="Balance" class="col-pri"><span class="customer-balance ${balClass}">${Fmt.currency(bal)}</span></td>
+      <td data-label="Status" class="col-secondary"><span class="badge badge-${statusClass}">${c.status || 'active'}</span></td>
+      <td class="muted col-opt" data-label="Last Tx">${c.last_transaction_date ? Fmt.date(c.last_transaction_date) : '—'}</td>
+      <td data-label="Actions" class="col-actions">
         <div class="table-actions">
-          <button class="action-btn" onclick="openModule('customer','${c.id}')" title="Detail Sheet" style="color:var(--accent)"><i class="fa-solid fa-arrow-up"></i></button>
-          <button class="action-btn view" onclick="viewCustomerDetail('${c.id}')" title="View"><i class="fa-solid fa-eye"></i></button>
+          <button class="action-btn view" onclick="openModule('customer','${c.id}')" title="View Details" style="color:var(--accent)"><i class="fa-solid fa-eye"></i></button>
           <button class="action-btn edit" onclick="editCustomer('${c.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
           <button class="action-btn" onclick="customerLedger('${c.id}')" title="Ledger" style="color:var(--info)"><i class="fa-solid fa-book"></i></button>
           <button class="action-btn delete" onclick="deleteCustomer('${c.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
@@ -4033,15 +4031,15 @@ Pages.purchaseInvoices = async function () {
     const bc = s === 'paid' ? 'success' : s === 'partial' ? 'warning' : s === 'received' ? 'info' : 'danger';
     const sl = s.charAt(0).toUpperCase() + s.slice(1);
     return `<tr>
-      <td style="font-weight:600" data-label="Invoice #">${esc(i.invoice_no)}</td>
-      <td data-label="Supplier"><div class="cell-name">${esc(i.supplier_name || '—')}</div></td>
-      <td class="muted" data-label="Date">${Fmt.date(i.date)}</td>
-      <td style="font-weight:600" data-label="Total">${Fmt.currency(i.total)}</td>
-      <td class="muted" data-label="Paid">${Fmt.currency(i.paid_amount || 0)}</td>
-      <td style="font-weight:600;color:${parseFloat(i.balance || i.total) > 0 ? 'var(--warning)' : 'var(--success)'}" data-label="Balance">${Fmt.currency(i.balance || i.total)}</td>
-      <td data-label="Status"><span class="badge badge-${bc}">${sl}</span></td>
-      <td data-label="Actions"><div class="table-actions">
-        <button class="action-btn view" onclick="viewPiInvoice('${i.id}')" title="View"><i class="fa-solid fa-eye"></i></button>
+      <td style="font-weight:600" class="col-pri" data-label="Invoice #">${esc(i.invoice_no)}</td>
+      <td data-label="Supplier" class="col-pri"><div class="cell-name">${esc(i.supplier_name || '—')}</div></td>
+      <td class="muted col-opt" data-label="Date">${Fmt.date(i.date)}</td>
+      <td style="font-weight:600" class="col-pri" data-label="Total">${Fmt.currency(i.total)}</td>
+      <td class="muted col-secondary" data-label="Paid">${Fmt.currency(i.paid_amount || 0)}</td>
+      <td style="font-weight:600;color:${parseFloat(i.balance || i.total) > 0 ? 'var(--warning)' : 'var(--success)'}" class="col-opt" data-label="Balance">${Fmt.currency(i.balance || i.total)}</td>
+      <td data-label="Status" class="col-pri"><span class="badge badge-${bc}">${sl}</span></td>
+      <td data-label="Actions" class="col-actions"><div class="table-actions">
+        <button class="action-btn view" onclick="viewPiInvoice('${i.id}')" title="View Details"><i class="fa-solid fa-eye"></i></button>
         <button class="action-btn edit" onclick="editPiInvoice('${i.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
         <button class="action-btn" onclick="printPiExisting('${i.id}')" title="Print"><i class="fa-solid fa-print"></i></button>
         <button class="action-btn delete" onclick="deletePurchase('${i.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
@@ -5114,14 +5112,16 @@ Pages.salesInvoices = async function () {
   if (!list.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-file-invoice"></i><h3>No sales</h3></div></td></tr>`; return; }
   tbody.innerHTML = list.map(i => `
     <tr>
-      <td style="font-weight:600" data-label="Invoice #">${esc(i.invoice_no)}</td>
-      <td class="muted" data-label="Customer">${esc(i.customer_name || '—')}</td>
-      <td class="muted" data-label="Date">${Fmt.date(i.date)}</td>
-      <td style="font-weight:600" data-label="Total">${Fmt.currency(i.total)}</td>
-      <td class="muted" data-label="Paid">${Fmt.currency(i.paid_amount)}</td>
-      <td class="muted" data-label="Balance">${Fmt.currency(i.balance)}</td>
-      <td data-label="Status"><span class="badge badge-${i.status === 'paid' ? 'success' : i.status === 'sent' ? 'info' : 'warning'}">${i.status}</span></td>
-      <td data-label="Actions"><div class="table-actions"><button class="action-btn delete" onclick="deleteSale('${i.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button></div></td>
+      <td style="font-weight:600" class="col-pri" data-label="Invoice #">${esc(i.invoice_no)}</td>
+      <td class="muted col-pri" data-label="Customer">${esc(i.customer_name || '—')}</td>
+      <td class="muted col-opt" data-label="Date">${Fmt.date(i.date)}</td>
+      <td style="font-weight:600" class="col-pri" data-label="Total">${Fmt.currency(i.total)}</td>
+      <td class="muted col-secondary" data-label="Paid">${Fmt.currency(i.paid_amount)}</td>
+      <td class="muted col-opt" data-label="Balance">${Fmt.currency(i.balance)}</td>
+      <td data-label="Status" class="col-pri"><span class="badge badge-${i.status === 'paid' ? 'success' : i.status === 'sent' ? 'info' : 'warning'}">${i.status}</span></td>
+      <td data-label="Actions" class="col-actions"><div class="table-actions">
+        <button class="action-btn delete" onclick="deleteSale('${i.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
     </tr>`).join('');
 };
 window.openSalesInvoiceModal = function() { showToast('Sales form coming soon', 'info'); };

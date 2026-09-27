@@ -122,10 +122,21 @@
 
 /* ── Action Buttons ──────────────────────────────────────── */
 .table-actions {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+}
+
+.data-table th:last-child,
+.data-table td:last-child,
+.data-table th.col-actions,
+.data-table td.col-actions {
+  white-space: nowrap !important;
+  min-width: 120px;
+  text-align: right;
 }
 
 .action-btn {
@@ -135,9 +146,10 @@
   background: var(--bg-glass);
   color: var(--txt-secondary);
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center;
   font-size: 12px;
   transition: all var(--transition);
+  flex-shrink: 0;
 }
 
 .action-btn:hover { background: var(--bg-glass-hov); color: var(--txt-primary); }
@@ -193,53 +205,46 @@
     font-size: 13px;
   }
 
-  /* Hide designated optional and secondary columns */
+  /* Hide designated optional and tablet-secondary columns across all tables */
   .col-optional,
   .col-secondary-tablet-hide,
   .data-table th.col-opt,
   .data-table td.col-opt,
-  .data-table th.col-secondary,
-  .data-table td.col-secondary {
+  .data-table th.col-secondary-tablet,
+  .data-table td.col-secondary-tablet {
     display: none !important;
   }
 
-  /* Specific column reductions for standard pages on tablet */
-  /* Purchase Invoices: Hide Date & Balance on tablet, keep Invoice#, Supplier, Total, Paid, Status, Actions */
-  #purchases-tbody tr td:nth-child(3),
-  .data-table thead tr th:nth-child(3),
-  #purchases-tbody tr td:nth-child(6),
-  .data-table thead tr th:nth-child(6) {
-    display: none;
-  }
-
-  /* Sales Invoices: Hide Date & Balance on tablet */
-  #sales-tbody tr td:nth-child(3),
-  #sales-tbody tr td:nth-child(6),
-  .page-container [id*="sales"] table thead tr th:nth-child(3),
-  .page-container [id*="sales"] table thead tr th:nth-child(6) {
-    display: none;
-  }
-
-  /* Customers: Hide Area/City & Last Tx on tablet */
-  #customers-tbody tr td:nth-child(4),
-  #customers-tbody tr td:nth-child(7),
-  #customer-table thead tr th:nth-child(4),
-  #customer-table thead tr th:nth-child(7) {
-    display: none;
-  }
-
-  /* Products: Hide Purchase Price & Unit on tablet */
-  #products-tbody tr td:nth-child(4),
-  #product-table thead tr th:nth-child(4) {
-    display: none;
+  /* Products: Hide Purchase Price & Barcode on tablet */
+  #product-table th.col-opt,
+  #product-table td.col-opt {
+    display: none !important;
   }
 
   /* Categories: Hide Description & Created date on tablet */
-  #categories-tbody tr td:nth-child(2),
-  #categories-tbody tr td:nth-child(5),
-  .page-container [id*="category"] table thead tr th:nth-child(2),
-  .page-container [id*="category"] table thead tr th:nth-child(5) {
-    display: none;
+  #category-table th.col-opt,
+  #category-table td.col-opt,
+  .page-container [id*="category"] table th.col-opt,
+  .page-container [id*="category"] table td.col-opt {
+    display: none !important;
+  }
+
+  /* Customers: Hide Area/City & Last Tx on tablet */
+  #customer-table th.col-opt,
+  #customer-table td.col-opt {
+    display: none !important;
+  }
+
+  /* Purchases: Hide Date & Balance on tablet */
+  #purchases-table th.col-opt,
+  #purchases-table td.col-opt {
+    display: none !important;
+  }
+
+  /* Sales: Hide Date & Balance on tablet */
+  .page-container [id*="sales"] table th.col-opt,
+  .page-container [id*="sales"] table td.col-opt {
+    display: none !important;
   }
 }
 

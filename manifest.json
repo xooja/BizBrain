@@ -1,11 +1,12 @@
 {
-  "name": "BizBrain — Business Manager",
-  "short_name": "BizBrain",
-  "description": "Offline-first business management: clients, projects, expenses, and invoices.",
+  "id": "/",
+  "name": "BizBrain-Pro",
+  "short_name": "BizBrain-Pro",
+  "description": "Professional offline-first business management: products, inventory, invoices, suppliers, customers, and reports.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "theme_color": "#0a0d14",
   "background_color": "#080b12",
   "lang": "en",
@@ -34,53 +35,48 @@
       "src": "assets/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "assets/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-
-  "screenshots": [
-    {
-      "src": "assets/screenshot-desktop.png",
-      "sizes": "1280x800",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "BizBrain Dashboard"
+      "purpose": "any"
     },
     {
-      "src": "assets/screenshot-mobile.png",
-      "sizes": "390x844",
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "BizBrain Mobile"
+      "purpose": "maskable"
     }
   ],
 
   "shortcuts": [
     {
-      "name": "New Client",
-      "short_name": "Client",
-      "description": "Add a new client",
-      "url": "/#clients",
+      "name": "New Sale",
+      "short_name": "Sale",
+      "description": "Create a new sales invoice",
+      "url": "/sales-invoices",
       "icons": [{ "src": "assets/icon-96.png", "sizes": "96x96" }]
     },
     {
-      "name": "New Invoice",
-      "short_name": "Invoice",
-      "description": "Create a new invoice",
-      "url": "/#invoices",
+      "name": "New Purchase",
+      "short_name": "Purchase",
+      "description": "Create a new purchase invoice",
+      "url": "/purchase-invoices",
       "icons": [{ "src": "assets/icon-96.png", "sizes": "96x96" }]
     },
     {
-      "name": "Add Expense",
-      "short_name": "Expense",
-      "description": "Record an expense",
-      "url": "/#expenses",
+      "name": "Add Product",
+      "short_name": "Product",
+      "description": "Add a new product",
+      "url": "/products",
       "icons": [{ "src": "assets/icon-96.png", "sizes": "96x96" }]
     }
   ],
